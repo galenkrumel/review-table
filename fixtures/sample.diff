@@ -1,0 +1,24 @@
+diff --git a/src/auth/session.ts b/src/auth/session.ts
+index 1a2b3c4..5d6e7f8 100644
+--- a/src/auth/session.ts
++++ b/src/auth/session.ts
+@@ -10,7 +10,8 @@ import { decode } from "./jwt";
+
+ export function parseAuth(header: string): Session {
+   const token = header.replace(/^Bearer /, "");
+-  const claims = decode(token);
++  const claims = decode(token)!;
++  if (!claims) throw new Error("bad token");
+   return Session.from(claims);
+ }
+
+@@ -44,6 +45,9 @@ export class Session {
+   static from(claims: Claims): Session {
+     const s = new Session();
+     s.userId = claims.sub;
++    s.roles = claims.roles ?? [];
++    s.expiresAt = claims.exp * 1000;
++    s.issuedAt = claims.iat * 1000;
+     return s;
+   }
+ }

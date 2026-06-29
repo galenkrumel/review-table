@@ -1,0 +1,712 @@
+:root {
+  --panel: #1b1d22;
+  --panel-2: #24272e;
+  --ink: #e9e6df;
+  --muted: #9aa0a8;
+  --accent: #e8b04b;
+  --topbar: 44px; /* approx height of .topbar; bounds the scene image's max-height */
+
+  /* ── Spotlight tuning — experiment with these ────────────────────────────
+     How the active speaker is lit vs. the rest of the scene while a dog talks.
+     All four take effect live (edit + save; Vite hot-reloads the CSS). */
+  --wash-dim: 0.45; /* whole-scene dimming. 0 = none, 1 = black. Higher = darker. */
+  --spotlight-brightness: 1.55; /* brightness() lift on the active dog. 1 = none, higher = brighter. */
+  --spotlight-saturate: 1.06; /* saturation() on the active dog. 1 = unchanged. */
+  --spotlight-glow: 0.2; /* warm halo alpha over the dog. 0 = off, higher = warmer/stronger. */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #0e0f12;
+  color: var(--ink);
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  background: var(--panel);
+  border-bottom: 1px solid #000;
+}
+.topbar h1 {
+  font-size: 16px;
+  letter-spacing: 0.3px;
+  margin: 0;
+}
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stop-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #5a1a1a;
+  color: #ffd9d9;
+  border: 1px solid #f08a8a;
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.stop-btn:hover {
+  background: #6e2020;
+}
+
+.conn {
+  font-size: 12px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  text-transform: lowercase;
+  border: 1px solid #000;
+}
+.conn-open {
+  background: #173d27;
+  color: #6fe39a;
+}
+.conn-connecting {
+  background: #3d3417;
+  color: var(--accent);
+}
+.conn-closed {
+  background: #3d1a1a;
+  color: #f08a8a;
+}
+
+.layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ---- Annotated code pane (inside the right dock) ---- */
+.editor {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+.editor.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.editor-empty-msg {
+  color: var(--muted);
+  font-style: italic;
+  font-size: 13px;
+}
+
+.file-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #161922;
+  color: #cdd3dc;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-bottom: 1px solid #000;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 52px 38px 14px 1fr;
+  align-items: baseline;
+  padding: 0 6px;
+  white-space: pre;
+  border-left: 3px solid transparent;
+}
+.row .g-anchor {
+  color: #5f6672;
+  font-size: 11px;
+}
+.row .g-num {
+  color: #4b5360;
+  text-align: right;
+  padding-right: 8px;
+}
+.row .g-mark {
+  color: var(--muted);
+  text-align: center;
+}
+.row .g-text {
+  color: #d7dbe2;
+}
+
+.row.added {
+  background: rgba(60, 160, 90, 0.1);
+}
+.row.added .g-mark {
+  color: #6fe39a;
+}
+.row.removed {
+  background: rgba(200, 80, 80, 0.1);
+}
+.row.removed .g-mark {
+  color: #f08a8a;
+}
+.row.removed .g-text {
+  color: #b79;
+  opacity: 0.8;
+}
+
+.row.hit {
+  background: rgba(232, 176, 75, 0.18);
+  border-left-color: var(--accent);
+}
+.row.hit .g-text {
+  color: #fff;
+}
+
+.gap {
+  color: #3a414c;
+  text-align: center;
+  font-size: 12px;
+  padding: 1px 0;
+  user-select: none;
+}
+
+/* ---- Focus control (dev) ---- */
+.focus-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: #14171d;
+  border-bottom: 1px solid #000;
+  flex-wrap: wrap;
+}
+.dev-tag {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #2c4a8f;
+  color: #dce6ff;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.focus-input {
+  background: var(--panel-2);
+  color: var(--ink);
+  border: 1px solid #000;
+  border-radius: 6px;
+  padding: 4px 7px;
+  font-size: 12px;
+  min-width: 0;
+  flex: 1;
+}
+.focus-input.hunk {
+  flex: 0 0 110px;
+}
+.focus-control button {
+  background: var(--accent);
+  color: #2a1d04;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.focus-control button.ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid #333;
+}
+
+/* ---- Scene ---- */
+.stage {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0b0d;
+}
+
+/* The <img> fits within the stage (letterboxed by its own max-width/height); the frame
+   is inline-block so it shrink-wraps the rendered image in BOTH axes. The overlay
+   siblings (inset:0) then register exactly to the image rect, at any size or dock state.
+   max-height is viewport-based (not a circular % of the frame) so the image never
+   overflows when the stage is height-limited (e.g. the diff dock collapsed). */
+.scene-frame {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+.scene-img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - var(--topbar, 44px));
+  width: auto;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Dark wash over the whole painting; the spotlight lifts the active seat back out.
+   --wash-dim controls how dark the scene goes while a dog speaks. */
+.scene-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgb(0 0 0 / var(--wash-dim, 0.45));
+}
+
+/* Soft warm radial over the active seat's region + a brightness bump on what's behind
+   it, so the dimmed dog reads as lamp-lit. Position transitions so the light swings.
+   --spotlight-glow / --spotlight-brightness / --spotlight-saturate are the knobs. */
+.spotlight {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgb(255 240 205 / var(--spotlight-glow, 0.2)) 0%,
+    rgb(255 240 205 / 0) 70%
+  );
+  -webkit-mask: radial-gradient(ellipse at center, #000 38%, transparent 74%);
+  mask: radial-gradient(ellipse at center, #000 38%, transparent 74%);
+  -webkit-backdrop-filter: brightness(var(--spotlight-brightness, 1.55))
+    saturate(var(--spotlight-saturate, 1.06));
+  backdrop-filter: brightness(var(--spotlight-brightness, 1.55))
+    saturate(var(--spotlight-saturate, 1.06));
+  transition:
+    left 0.2s ease,
+    top 0.2s ease,
+    width 0.2s ease,
+    height 0.2s ease,
+    opacity 0.2s ease,
+    filter 0.08s linear;
+}
+/* Crude amplitude life: the lamp breathes a touch as the active dog speaks. */
+.spotlight[data-mouth="mid"] {
+  filter: brightness(1.06);
+}
+.spotlight[data-mouth="open"] {
+  filter: brightness(1.13);
+}
+
+/* While the director (bulldog) decides, a faint glow over its region. */
+.director-glow {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(232, 176, 75, 0.16) 0%,
+    rgba(232, 176, 75, 0) 70%
+  );
+  animation: director-pulse 1.6s ease-in-out infinite;
+}
+@keyframes director-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.thinking-beat {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  transform: translateX(-50%);
+  font-style: italic;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 6px 14px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.captions {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  width: min(72%, 760px);
+  min-height: 48px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 16px;
+  text-align: center;
+}
+.captions p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+.captions-empty {
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* Name-tagged caption anchored near the active seat (B4). Solid + shadowed for
+   legibility over the painting; doubles as subtitles with audio muted. */
+.speaker-caption {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: max-content;
+  max-width: min(34%, 320px);
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(10, 11, 14, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+.speaker-name {
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--accent);
+}
+.speaker-text {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+/* Persistent per-seat name labels (identify who's who over the painting). Subtle by
+   default so they inform without dominating; the active speaker shows its full caption. */
+.seat-label {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: var(--ink);
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(10, 11, 14, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* ---- Verdict panel (review_complete) ---- */
+.verdict-panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(78%, 560px);
+  max-height: 80%;
+  overflow-y: auto;
+  background: rgba(12, 13, 16, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 18px 22px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+.verdict-headline {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.verdict-approve .verdict-headline {
+  color: #6fe39a;
+}
+.verdict-request_changes .verdict-headline {
+  color: #f08a8a;
+}
+.verdict-comment .verdict-headline {
+  color: var(--accent);
+}
+.verdict-issues {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.issue {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.issue-status {
+  flex-shrink: 0;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  margin-top: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+}
+.issue-resolved .issue-status {
+  background: #173d27;
+  color: #6fe39a;
+}
+.issue-blocking .issue-status {
+  background: #3d1a1a;
+  color: #f08a8a;
+}
+.issue-deferred .issue-status {
+  background: #2c3038;
+  color: #aeb6c2;
+}
+.issue-open .issue-status {
+  background: #3d3417;
+  color: var(--accent);
+}
+.issue-gist {
+  color: #d7dbe2;
+}
+.verdict-empty {
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ---- Human input (M4: author in the loop) ---- */
+.raise-paw {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 3;
+  background: #2c4a8f;
+  color: #dce6ff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+.raise-paw:hover {
+  background: #35589f;
+}
+
+.human-input {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  width: min(80%, 820px);
+  z-index: 4;
+  background: rgba(12, 13, 16, 0.92);
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.6);
+}
+.human-input-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+.human-input-by {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+}
+.human-input-q {
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.35;
+}
+.human-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+.human-input-text {
+  flex: 1;
+  min-height: 52px;
+  max-height: 140px;
+  resize: vertical;
+  background: var(--panel-2);
+  color: var(--ink);
+  border: 1px solid #000;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  font-family: inherit;
+}
+.human-input-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 0 200px;
+}
+.send-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: var(--accent);
+  color: #2a1d04;
+  font-weight: 600;
+  font-size: 14px;
+}
+.send-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.ptt-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #000;
+  background: var(--panel-2);
+  color: var(--ink);
+  user-select: none;
+  touch-action: none;
+}
+.ptt-btn.recording {
+  background: #5a1a1a;
+  color: #ffd9d9;
+  border-color: #f08a8a;
+}
+.human-input-muted {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #f0b48a;
+  font-style: italic;
+}
+
+/* ---- Right dock: collapsible diff + code pane (B2) ---- */
+.right-dock {
+  position: relative;
+  flex-shrink: 0;
+  width: 440px;
+  background: var(--panel);
+  border-left: 1px solid #000;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  transition: width 0.2s ease;
+}
+.right-dock.collapsed {
+  width: 18px;
+}
+.dock-toggle {
+  position: absolute;
+  left: -14px;
+  top: 14px;
+  z-index: 5;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--panel-2);
+  color: var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+.dock-toggle:hover {
+  background: #2e323b;
+}
+.dock-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+}
+.right-dock.collapsed .dock-content {
+  display: none;
+}
+
+.diff-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+.dock-content .editor {
+  flex: 1;
+  min-height: 180px;
+}
+.diff-label {
+  font-size: 13px;
+  color: var(--muted);
+}
+.diff-textarea {
+  min-height: 150px;
+  max-height: 36vh;
+  resize: vertical;
+  background: var(--panel-2);
+  color: var(--ink);
+  border: 1px solid #000;
+  border-radius: 8px;
+  padding: 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.start-btn {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: var(--accent);
+  color: #2a1d04;
+  font-weight: 600;
+  font-size: 14px;
+}
+.start-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

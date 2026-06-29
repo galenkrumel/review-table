@@ -1,0 +1,18 @@
+# Dependencies & build output
+node_modules/
+dist/
+*.tsbuildinfo
+.turbo/
+
+# Secrets — never commit real keys (NFR-3). The template .env.example is kept.
+.env
+.env.*
+!.env.example
+
+# Local / editor
+*.log
+*.bak
+*.swp
+*.swo
+.DS_Store
+.claude/settings.local.json
