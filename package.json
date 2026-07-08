@@ -13,6 +13,8 @@
     "typecheck": "pnpm -r typecheck",
     "build": "pnpm -r build",
     "dev": "node scripts/dev.mjs",
+    "eval": "pnpm --filter @review-table/server run eval",
+    "eval:check": "pnpm --filter @review-table/server run eval --check",
     "lint": "biome check .",
     "format": "biome check --write ."
   },

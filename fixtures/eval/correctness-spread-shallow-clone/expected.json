@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "shallow-spread-aliases-nested",
+      "category": "correctness",
+      "severity": "med",
+      "line_hint": "src/state/settings.ts:10",
+      "description": "{ ...s } is a SHALLOW copy: next.ui is the same object as s.ui. Assigning next.ui.theme therefore mutates the caller's s.ui.theme too, contradicting the JSDoc promise 'leaving the original untouched'. Callers relying on immutability (undo, memoised selectors) break. Needs a nested copy: { ...s, ui: { ...s.ui, theme } }.",
+      "must_catch": true
+    }
+  ]
+}

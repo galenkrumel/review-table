@@ -1,0 +1,21 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "unchecked-null",
+      "category": "correctness",
+      "severity": "high",
+      "line_hint": "src/cache/lookup.ts:12",
+      "description": "The `if (!entry) return 0` guard was removed. `priceMap.get(sku)` returns `undefined` for an unknown SKU, so `entry.price` / `entry.region` throw a TypeError at runtime for any cache miss.",
+      "must_catch": true
+    },
+    {
+      "id": "region-null-unchecked",
+      "category": "correctness",
+      "severity": "med",
+      "line_hint": "src/cache/lookup.ts:12",
+      "description": "The added `applyTax(entry.region)` on line 12 dereferences entry.region. Even when entry is defined, a null/undefined region can make applyTax throw — a second, diff-introduced defect distinct from the removed null guard. Region's nullability is not provable from the diff, so optional.",
+      "must_catch": false
+    }
+  ]
+}

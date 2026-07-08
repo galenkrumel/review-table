@@ -1,0 +1,12 @@
+diff --git a/src/auth/api-key.ts b/src/auth/api-key.ts
+index 9f0a100..9f0a101 100644
+--- a/src/auth/api-key.ts
++++ b/src/auth/api-key.ts
+@@ -6,9 +6,7 @@ import { timingSafeEqual } from "node:crypto";
+ // Returns true iff the presented key matches the configured secret.
+ export function checkApiKey(provided: string, expected: string): boolean {
+-  const a = Buffer.from(provided);
+-  const b = Buffer.from(expected);
+-  return a.length === b.length && timingSafeEqual(a, b);
++  return provided === expected;
+ }

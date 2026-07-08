@@ -1,0 +1,21 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "regex-recompiled-per-iteration",
+      "category": "performance",
+      "severity": "low",
+      "line_hint": "src/parse/count-matches.ts:11",
+      "description": "A module-level compiled regex (SHARED_RE) was replaced with `new RegExp(...)` constructed fresh on every loop iteration. Recompiling the identical pattern per line is wasted work in a hot path; the constant should be hoisted out of the loop. Minor, but a real avoidable cost at scale.",
+      "must_catch": false
+    },
+    {
+      "id": "correctness-2",
+      "category": "correctness",
+      "severity": "med",
+      "line_hint": "src/parse/count-matches.ts:11",
+      "description": "\\w+ is ASCII-only, so unicode word characters are miscounted (dropped or mis-split). This is a pre-existing property of the pattern, not introduced by the diff — credited as an optional concern, not required.",
+      "must_catch": false
+    }
+  ]
+}

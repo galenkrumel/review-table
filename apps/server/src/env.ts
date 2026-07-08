@@ -19,6 +19,12 @@ export const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL ?? "claude-opus-4-8";
 // cheaper model than the dogs to shrink the between-turns "thinking" gap. Defaults to the
 // dog model (no change) — set DIRECTOR_MODEL, e.g. claude-haiku-4-5-20251001, to speed it up.
 export const DIRECTOR_MODEL = process.env.DIRECTOR_MODEL ?? ANTHROPIC_MODEL;
+// The eval judge does semantic matching of findings to ground truth (eval only). Defaults to
+// Sonnet: at 5× sampling it was the value pick — near-Fable self-consistency (3/30 unstable vs
+// Fable's 2, Haiku's 9) and tighter precision (16 FPs vs Haiku's 19) at a fraction of Fable's
+// $10/$50 per-MTok cost. Override with JUDGE_MODEL (claude-fable-5 for a gold-standard pass;
+// claude-haiku-4-5-20251001 for a cheap, noisier check; claude-opus-4-8 to judge with the dog model).
+export const JUDGE_MODEL = process.env.JUDGE_MODEL ?? "claude-sonnet-5";
 export const ELEVENLABS_MODEL = process.env.ELEVENLABS_MODEL ?? "eleven_turbo_v2_5";
 export const ELEVENLABS_STT_MODEL = process.env.ELEVENLABS_STT_MODEL ?? "scribe_v1";
 

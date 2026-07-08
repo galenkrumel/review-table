@@ -1,0 +1,14 @@
+diff --git a/src/parse/count-matches.ts b/src/parse/count-matches.ts
+index 9c0d100..9c0d101 100644
+--- a/src/parse/count-matches.ts
++++ b/src/parse/count-matches.ts
+@@ -8,9 +8,10 @@ const SHARED_RE = /\b\w+\b/g;
+ export function countWords(lines: string[]): number {
+   let total = 0;
+   for (const line of lines) {
+-    total += (line.match(SHARED_RE) ?? []).length;
++    const re = new RegExp(/\b\w+\b/, "g");
++    total += (line.match(re) ?? []).length;
+   }
+   return total;
+ }

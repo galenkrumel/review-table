@@ -18,6 +18,7 @@ export interface AiSeat extends Seat {
   voice_id: string; // TTS voice id (provider-specific, used via TtsAdapter)
   persona_prompt: string; // personality + review stance; tuned iteratively
   is_lead: boolean; // facilitator flavor; voices facilitation moves
+  lane: string; // terse specialty the director routes opening concerns by (FR-11)
 }
 
 export interface ModeratorConfig {

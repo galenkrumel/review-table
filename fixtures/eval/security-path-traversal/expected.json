@@ -1,0 +1,21 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "path-traversal",
+      "category": "security",
+      "severity": "med",
+      "line_hint": "src/api/files.ts:32",
+      "description": "The sanitize() call on the user-controlled `name` was removed (justified by a misleading 'validated on the client' comment). A name like `../../etc/passwd` escapes UPLOAD_DIR via path.join — directory traversal / arbitrary file read.",
+      "must_catch": true
+    },
+    {
+      "id": "buffer-return-contract-lie",
+      "category": "correctness",
+      "severity": "low",
+      "line_hint": "src/api/files.ts:30",
+      "description": "readUserFile is typed to always return Buffer, but readFileSync throws on a bad/nonexistent path (ENOENT), so the signature is a contract lie. Pre-existing property, not introduced by the diff — optional. Should declare it throws or return Buffer | null.",
+      "must_catch": false
+    }
+  ]
+}

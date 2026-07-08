@@ -1,0 +1,12 @@
+diff --git a/src/util/group.ts b/src/util/group.ts
+index 1111111..2222222 100644
+--- a/src/util/group.ts
++++ b/src/util/group.ts
+@@ -1,3 +1,7 @@
+ import type { Item } from "../types";
+
+ export type Page = Item[];
++
++export function flattenPages(pages: Item[][]): Item[] {
++  return pages.reduce((acc, page) => [...acc, ...page], [] as Item[]);
++}

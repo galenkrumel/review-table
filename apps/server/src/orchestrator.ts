@@ -323,6 +323,7 @@ export async function runReview(
       seat_id: dog.seat.id,
       move: dog.move.move,
       focus_anchors: dog.highlight,
+      thread_id: dog.move.thread_id,
     });
     sink.send({ type: "highlight", anchors: dog.highlight });
     for (const delta of dog.deltas) sink.send({ type: "text_delta", seat_id: dog.seat.id, delta });

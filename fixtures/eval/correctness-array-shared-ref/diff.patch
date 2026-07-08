@@ -1,0 +1,15 @@
+diff --git a/src/grid/board.ts b/src/grid/board.ts
+index 1111111..2222222 100644
+--- a/src/grid/board.ts
++++ b/src/grid/board.ts
+@@ -1,4 +1,10 @@
+ export interface Board {
+   cells: number[][];
+   size: number;
+ }
++
++/** Build a size×size board with every cell initialised to 0. */
++export function emptyBoard(size: number): Board {
++  const cells = new Array(size).fill(new Array(size).fill(0));
++  return { cells, size };
++}

@@ -1,0 +1,12 @@
+diff --git a/src/util/merge.ts b/src/util/merge.ts
+index 8a9b100..8a9b101 100644
+--- a/src/util/merge.ts
++++ b/src/util/merge.ts
+@@ -3,7 +3,6 @@ import { isObject } from "./is-object";
+ // Recursively merges `source` into `target` and returns `target`.
+ export function deepMerge(target: any, source: any): any {
+   for (const key of Object.keys(source)) {
+-    if (key === "__proto__" || key === "constructor") continue;
+     if (isObject(source[key])) {
+       target[key] = deepMerge(target[key] ?? {}, source[key]);
+     } else {

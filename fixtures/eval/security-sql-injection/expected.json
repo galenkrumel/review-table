@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "sql-injection",
+      "category": "security",
+      "severity": "high",
+      "line_hint": "src/db/users.ts:19",
+      "description": "Parameterized query was replaced with a template string that interpolates the untrusted `name` argument directly into SQL. Classic SQL injection: a name like `' OR '1'='1` or `'; DROP TABLE users; --` is executed verbatim.",
+      "must_catch": true
+    }
+  ]
+}

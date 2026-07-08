@@ -1,0 +1,11 @@
+diff --git a/src/db/search.ts b/src/db/search.ts
+index 2e3f100..2e3f101 100644
+--- a/src/db/search.ts
++++ b/src/db/search.ts
+@@ -10,7 +10,8 @@ import { sql } from "./client";
+ // `sql` is the postgres.js tagged-template; ${...} becomes a bound $1 placeholder,
+ // not string interpolation. The user term is passed as a parameter, never concatenated.
+ export async function searchUsers(db: Db, term: string) {
+-  return db.query(sql`SELECT id, email FROM users WHERE active = true`);
++  return db.query(sql`SELECT id, email FROM users WHERE active = true AND name ILIKE ${"%" + term + "%"}`);
+ }

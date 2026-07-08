@@ -1,0 +1,14 @@
+diff --git a/src/jobs/notify.ts b/src/jobs/notify.ts
+index 7c1d010..7c1d011 100644
+--- a/src/jobs/notify.ts
++++ b/src/jobs/notify.ts
+@@ -12,9 +12,9 @@ import { sendEmail } from "./mailer";
+ // Resolves once every user has been notified.
+ export async function notifyAll(users: User[]): Promise<void> {
+-  for (const u of users) {
+-    await sendEmail(u);
+-  }
++  users.forEach(async (u) => {
++    await sendEmail(u);
++  });
+ }

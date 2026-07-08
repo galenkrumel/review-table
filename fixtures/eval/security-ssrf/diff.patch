@@ -1,0 +1,13 @@
+diff --git a/src/integrations/link-preview.ts b/src/integrations/link-preview.ts
+index 5e6f100..5e6f101 100644
+--- a/src/integrations/link-preview.ts
++++ b/src/integrations/link-preview.ts
+@@ -9,8 +9,8 @@ import { assertPublicUrl } from "./url-guard";
+ // Fetches the target page so we can render an unfurl card.
+ export async function fetchPreview(req: Request): Promise<string> {
+-  const url = assertPublicUrl(req.body.target);
+-  const res = await fetch(url);
++  const url = req.body.target as string;
++  const res = await fetch(url);
+   return res.text();
+ }

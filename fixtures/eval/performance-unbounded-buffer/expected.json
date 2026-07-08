@@ -1,0 +1,29 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "unbounded-body-buffering",
+      "category": "performance",
+      "severity": "med",
+      "line_hint": "src/upload/read-body.ts:9",
+      "description": "The running size accumulator and `if (size > limit) throw PayloadTooLargeError()` check were removed, so the entire stream is buffered into memory with no cap. An untrusted/large upload now drives unbounded memory growth (OOM / DoS). The `limit` parameter is now dead, a tell that the guard was dropped.",
+      "must_catch": true
+    },
+    {
+      "id": "unused-limit-param",
+      "category": "correctness",
+      "severity": "low",
+      "line_hint": "src/upload/read-body.ts:6",
+      "description": "The `limit` parameter and `size` variable are now unused after the cap check was removed.",
+      "must_catch": false
+    },
+    {
+      "id": "correctness-3",
+      "category": "correctness",
+      "severity": "med",
+      "line_hint": "src/upload/read-body.ts:9",
+      "description": "contract ambiguity of what zero or negative limit values mean",
+      "must_catch": false
+    }
+  ]
+}

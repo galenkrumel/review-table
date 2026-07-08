@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "json-parse-invariant-in-map",
+      "category": "performance",
+      "severity": "med",
+      "line_hint": "src/pricing/lookup.ts:7",
+      "description": "JSON.parse(tableJson) runs once per sku inside the map, but tableJson is invariant across the loop. Parsing (allocating the whole table object) dominates and turns an O(n) lookup into O(n × parse-cost). Hoist the parse above skus.map so the table is built once.",
+      "must_catch": true
+    }
+  ]
+}

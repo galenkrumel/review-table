@@ -1,0 +1,15 @@
+diff --git a/src/migrate/run.ts b/src/migrate/run.ts
+index 6a7b100..6a7b101 100644
+--- a/src/migrate/run.ts
++++ b/src/migrate/run.ts
+@@ -6,7 +6,11 @@ import type { Migration } from "./types";
+ // Apply pending migrations.
+ export async function runMigrations(steps: Migration[]): Promise<void> {
+-  await Promise.all(steps.map((s) => s.run()));
++  // Migrations MUST run strictly in order: each step assumes the schema left by the
++  // previous one. Parallelizing here would corrupt the database, so the serial await
++  // is intentional, not an oversight.
++  for (const step of steps) {
++    await step.run();
++  }
+ }

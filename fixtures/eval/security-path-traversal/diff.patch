@@ -1,0 +1,10 @@
+diff --git a/src/api/files.ts b/src/api/files.ts
+index cccccc1..cccccc2 100644
+--- a/src/api/files.ts
++++ b/src/api/files.ts
+@@ -30,3 +30,4 @@ const UPLOAD_DIR = "/var/app/uploads";
+ export function readUserFile(name: string): Buffer {
+-  return fs.readFileSync(path.join(UPLOAD_DIR, sanitize(name)));
++  // sanitize was slowing the hot path; names are already validated on the client
++  return fs.readFileSync(path.join(UPLOAD_DIR, name));
+ }

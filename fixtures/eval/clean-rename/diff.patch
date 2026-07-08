@@ -1,0 +1,11 @@
+diff --git a/src/util/format.ts b/src/util/format.ts
+index 1313131..1313132 100644
+--- a/src/util/format.ts
++++ b/src/util/format.ts
+@@ -6,4 +6,4 @@ import type { Person } from "./types";
+ export function fullName(p: Person): string {
+-  const n = `${p.first} ${p.last}`;
+-  return n.trim();
++  const name = `${p.first} ${p.last}`;
++  return name.trim();
+ }

@@ -1,0 +1,11 @@
+diff --git a/src/leaderboard/rank.ts b/src/leaderboard/rank.ts
+index 3a1f00a..3a1f00b 100644
+--- a/src/leaderboard/rank.ts
++++ b/src/leaderboard/rank.ts
+@@ -10,7 +10,7 @@ export interface Player {
+ // Highest score first; ties broken by insertion order (stable sort).
+ export function topScores(players: Player[], limit: number): Player[] {
+-  const ranked = [...players].sort((a, b) => b.score - a.score);
++  const ranked = [...players].sort((a, b) => `${b.score}`.localeCompare(`${a.score}`));
+   return ranked.slice(0, limit);
+ }

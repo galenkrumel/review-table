@@ -1,0 +1,12 @@
+diff --git a/src/api/admin.ts b/src/api/admin.ts
+index dddddd1..dddddd2 100644
+--- a/src/api/admin.ts
++++ b/src/api/admin.ts
+@@ -40,7 +40,4 @@ import { users } from "../db/users";
+ export async function deleteUser(req: Req, res: Res) {
+-  if (!req.user?.isAdmin) {
+-    return res.status(403).end();
+-  }
+   await users.remove(req.params.id);
+   res.status(204).end();
+ }

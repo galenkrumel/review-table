@@ -1,0 +1,13 @@
+diff --git a/src/sync/fetchAll.ts b/src/sync/fetchAll.ts
+index 1212121..1212122 100644
+--- a/src/sync/fetchAll.ts
++++ b/src/sync/fetchAll.ts
+@@ -10,3 +10,7 @@ import { client } from "./client";
+ export async function fetchAll(ids: string[]): Promise<Item[]> {
+-  return Promise.all(ids.map((id) => client.get(id)));
++  const items: Item[] = [];
++  for (const id of ids) {
++    items.push(await client.get(id));
++  }
++  return items;
+ }

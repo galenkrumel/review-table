@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "async-foreach-not-awaited",
+      "category": "correctness",
+      "severity": "high",
+      "line_hint": "src/jobs/notify.ts:15",
+      "description": "The awaited for-of loop was replaced with `forEach(async ...)`. forEach ignores the returned promises, so notifyAll resolves immediately while the emails are still in flight, breaking the documented 'resolves once every user is notified' contract and swallowing any sendEmail rejection (unhandled promise rejection).",
+      "must_catch": true
+    }
+  ]
+}

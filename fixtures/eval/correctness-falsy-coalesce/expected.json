@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "falsy-coalesce-zero-rate",
+      "category": "correctness",
+      "severity": "med",
+      "line_hint": "src/checkout/discount.ts:20",
+      "description": "Nullish coalescing `??` was changed to logical OR `||`. An explicit rate of 0 (a valid 'no discount' value) is falsy, so `||` discards it and silently applies DEFAULT_RATE (10% off). Only `undefined`/`null` should fall back to the default.",
+      "must_catch": true
+    }
+  ]
+}

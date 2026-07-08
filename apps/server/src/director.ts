@@ -102,6 +102,10 @@ Choreograph a debate (this is the point):
 Pace and balance:
 - Spread the floor across all three dogs. Prefer a dog with FEWER turns so far; never let one dominate.
 - Open threads on hunks that are still uncovered. Move the review forward.
+- When you OPEN a thread (raise_issue), set next_speaker to the dog whose lane the concern falls in:
+  security/input/edge-cases → Bella, performance/complexity/resource → Duke, correctness and cross-cutting
+  → Rex. The lead opens what doesn't clearly belong to a specialist. After the open, keep choreographing
+  cross-dog debate as before.
 
 The anti-agreeableness gate (hard rule):
 - A thread may only be resolved AFTER it has taken genuine pushback. Never emit "resolve" for a thread
@@ -148,7 +152,7 @@ function recentTranscript(transcript: TranscriptEntry[], n = 6): string {
 
 function buildDirectorUser(ctx: DirectorContext): string {
   const seatList =
-    AI_SEATS.map((s) => `${s.id} (${s.display_name}: ${s.is_lead ? "lead" : "reviewer"})`).join(
+    AI_SEATS.map((s) => `${s.id} (${s.display_name}${s.is_lead ? ", lead" : ""} — ${s.lane})`).join(
       ", ",
     ) + `, ${HUMAN_SEAT.id} (${HUMAN_SEAT.display_name}: the code author — answers when called on)`;
   const rendered = renderFilesForModel(ctx.files);
@@ -174,7 +178,7 @@ function buildDirectorUser(ctx: DirectorContext): string {
     ctx.complete
       ? `Every hunk is now covered. Emit move="close" with the overall verdict and a wrap-up brief for the lead.`
       : ctx.turnNumber === 0
-        ? `Emit the OPENING move: have a dog raise the most interesting real concern in the diff.`
+        ? `Emit the OPENING move: have the right specialist raise the most interesting real concern in the diff.`
         : `Emit the next move that best advances the review.`,
   ];
 

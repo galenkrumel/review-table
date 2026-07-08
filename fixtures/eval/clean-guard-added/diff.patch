@@ -1,0 +1,11 @@
+diff --git a/src/parse/port.ts b/src/parse/port.ts
+index 1515151..1515152 100644
+--- a/src/parse/port.ts
++++ b/src/parse/port.ts
+@@ -3,3 +3,6 @@ export function parsePort(raw: string): number {
+   const n = Number(raw);
++  if (!Number.isInteger(n) || n < 1 || n > 65535) {
++    throw new Error(`invalid port: ${raw}`);
++  }
+   return n;
+ }

@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "jwt-decode-without-verify",
+      "category": "security",
+      "severity": "high",
+      "line_hint": "src/auth/claims.ts:7",
+      "description": "`jwt.verify(token, PUBLIC_KEY, ...)` was replaced with `jwt.decode(token)`, which parses the token WITHOUT checking the signature or algorithm. Any attacker can forge a token with arbitrary claims (e.g. another user's sub, or admin roles) and it will be accepted. The function still claims to return 'verified' claims.",
+      "must_catch": true
+    }
+  ]
+}

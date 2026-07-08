@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "ssrf-unvalidated-fetch",
+      "category": "security",
+      "severity": "high",
+      "line_hint": "src/integrations/link-preview.ts:12",
+      "description": "The `assertPublicUrl` guard was removed and the raw user-supplied `req.body.target` is now passed straight to `fetch`. This is server-side request forgery: an attacker can point the URL at internal services or the cloud metadata endpoint (e.g. http://169.254.169.254/) and exfiltrate the response text.",
+      "must_catch": true
+    }
+  ]
+}

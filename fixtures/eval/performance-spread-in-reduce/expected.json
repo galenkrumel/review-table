@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "spread-accumulator-quadratic",
+      "category": "performance",
+      "severity": "med",
+      "line_hint": "src/util/group.ts:6",
+      "description": "reduce((acc, page) => [...acc, ...page]) allocates a brand-new array and copies the entire accumulator on every iteration, so flattening N pages of total length M is O(N·M) — quadratic in the item count. Idiomatic-looking but a hot-path trap; use acc.push(...page) then return acc, or pages.flat(), for O(M).",
+      "must_catch": true
+    }
+  ]
+}

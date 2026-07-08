@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "smoke": "USE_FAKES=1 tsx src/smoke-m4.ts",
+    "eval": "tsx src/eval/run-eval.ts",
     "build": "tsc"
   },
   "dependencies": {

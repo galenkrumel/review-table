@@ -113,6 +113,7 @@ export async function runSpeaker(
     model_id: seat.model_id,
     system,
     messages: [{ seat_id: seat.id, role: "user", text: user }],
+    cacheKey: `persona:${seat.id}`, // constant per dog; cached if above the model minimum
   })) {
     if (signal?.aborted) break; // interject: stop streaming the line to the client
     text += delta;

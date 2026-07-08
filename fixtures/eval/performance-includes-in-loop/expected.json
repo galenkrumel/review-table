@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "array-includes-membership-quadratic",
+      "category": "performance",
+      "severity": "med",
+      "line_hint": "src/dedupe/filter.ts:8",
+      "description": "result.includes(id) is an O(n) linear scan and it runs once per input id, so de-duplication is O(n²) in the number of ids. A Set<string> for the seen-set makes membership O(1) and the whole pass O(n). Invisible on tiny lists, pathological on large ones.",
+      "must_catch": true
+    }
+  ]
+}

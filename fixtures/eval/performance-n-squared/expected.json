@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "n-squared-dedupe",
+      "category": "performance",
+      "severity": "med",
+      "line_hint": "src/report/dedupe.ts:11",
+      "description": "The O(1) Set membership check was replaced with `out.includes(r.id)`, an O(n) array scan, inside the per-row loop. Deduplication is now O(n^2) — quadratic blow-up on large row sets in this hot path.",
+      "must_catch": true
+    }
+  ]
+}

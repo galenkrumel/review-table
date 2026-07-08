@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "swallowed-exception",
+      "category": "correctness",
+      "severity": "med",
+      "line_hint": "src/io/writeConfig.ts:25",
+      "description": "The new try/catch swallows the write error and `return true` from the catch block, so writeConfig reports success even when fs.writeFileSync throws (disk full, permissions, bad path). Callers will believe the config was persisted.",
+      "must_catch": true
+    }
+  ]
+}

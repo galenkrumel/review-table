@@ -1,0 +1,16 @@
+diff --git a/src/io/readAll.ts b/src/io/readAll.ts
+index ffffff1..ffffff2 100644
+--- a/src/io/readAll.ts
++++ b/src/io/readAll.ts
+@@ -14,8 +14,6 @@ import * as fs from "node:fs";
+ export function readAll(path: string): string {
+   const fd = fs.openSync(path, "r");
+-  try {
+-    return drain(fd);
+-  } finally {
+-    fs.closeSync(fd);
+-  }
++  const data = drain(fd);
++  fs.closeSync(fd);
++  return data;
+ }

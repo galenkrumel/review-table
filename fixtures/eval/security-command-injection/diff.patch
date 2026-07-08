@@ -1,0 +1,10 @@
+diff --git a/src/ops/backup.ts b/src/ops/backup.ts
+index bbbbbb1..bbbbbb2 100644
+--- a/src/ops/backup.ts
++++ b/src/ops/backup.ts
+@@ -22,3 +22,4 @@ import { execSync } from "node:child_process";
+ export function archive(dir: string): void {
+-  execSync("tar czf backup.tgz ./data");
++  // allow the caller to choose which directory to archive
++  execSync(`tar czf backup.tgz ${dir}`);
+ }

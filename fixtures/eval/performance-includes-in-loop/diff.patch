@@ -1,0 +1,16 @@
+diff --git a/src/dedupe/filter.ts b/src/dedupe/filter.ts
+index 1111111..2222222 100644
+--- a/src/dedupe/filter.ts
++++ b/src/dedupe/filter.ts
+@@ -1,3 +1,11 @@
+ // De-duplication helpers for id lists.
+
+ export const EMPTY: string[] = [];
++
++export function uniqueIds(ids: string[]): string[] {
++  const result: string[] = [];
++  for (const id of ids) {
++    if (!result.includes(id)) result.push(id);
++  }
++  return result;
++}

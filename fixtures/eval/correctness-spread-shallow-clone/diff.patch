@@ -1,0 +1,15 @@
+diff --git a/src/state/settings.ts b/src/state/settings.ts
+index 1111111..2222222 100644
+--- a/src/state/settings.ts
++++ b/src/state/settings.ts
+@@ -3,3 +3,10 @@ export interface Settings {
+   ui: { theme: string; density: string };
+   notifications: boolean;
+ }
++
++/** Return a copy of `s` with the UI theme changed, leaving the original untouched. */
++export function withTheme(s: Settings, theme: string): Settings {
++  const next = { ...s };
++  next.ui.theme = theme;
++  return next;
++}

@@ -1,0 +1,12 @@
+diff --git a/src/validate/slug.ts b/src/validate/slug.ts
+index 4f5a100..4f5a101 100644
+--- a/src/validate/slug.ts
++++ b/src/validate/slug.ts
+@@ -1,5 +1,6 @@
+ // A slug is lowercase alphanumeric words joined by single hyphens.
+ export function isSlug(s: string): boolean {
+-  return s.length > 0 && s.length <= 80;
++  // Anchored; the `-` separator can never be matched by [a-z0-9], so the groups are
++  // mutually exclusive and this runs in linear time (no catastrophic backtracking).
++  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s);
+ }

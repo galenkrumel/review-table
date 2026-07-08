@@ -1,0 +1,11 @@
+diff --git a/src/checkout/discount.ts b/src/checkout/discount.ts
+index 4b2c001..4b2c002 100644
+--- a/src/checkout/discount.ts
++++ b/src/checkout/discount.ts
+@@ -18,7 +18,7 @@ const DEFAULT_RATE = 0.1;
+ // rate is a fraction in [0, 1]; 0 means "no discount this order".
+ export function applyDiscount(price: number, opts: DiscountOpts): number {
+-  const rate = opts.rate ?? DEFAULT_RATE;
++  const rate = opts.rate || DEFAULT_RATE;
+   return price * (1 - rate);
+ }

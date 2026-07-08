@@ -1,0 +1,12 @@
+diff --git a/src/jobs/enqueue.ts b/src/jobs/enqueue.ts
+index 3333333..4444444 100644
+--- a/src/jobs/enqueue.ts
++++ b/src/jobs/enqueue.ts
+@@ -14,5 +14,6 @@ import { metrics } from "../metrics";
+ export async function enqueueJob(job: Job): Promise<boolean> {
+-  const saved = await persist(job);
++  const saved = persist(job);
+   if (saved) {
++    metrics.increment("job.enqueued");
+     return true;
+   }

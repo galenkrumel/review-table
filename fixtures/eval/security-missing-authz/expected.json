@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "missing-authorization",
+      "category": "security",
+      "severity": "high",
+      "line_hint": "src/api/admin.ts:41",
+      "description": "The admin authorization check (`if (!req.user?.isAdmin) return 403`) was deleted, so the destructive deleteUser endpoint is now reachable by any authenticated user. Broken access control on a delete route.",
+      "must_catch": true
+    }
+  ]
+}

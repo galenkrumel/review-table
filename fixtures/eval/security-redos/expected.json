@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "redos-nested-quantifier",
+      "category": "security",
+      "severity": "high",
+      "line_hint": "src/validate/email.ts:5",
+      "description": "The new email regex contains a nested quantifier `([a-zA-Z0-9]+)+` (and an adjacent `(...+)+` group), which causes catastrophic backtracking. A crafted input like a long run of valid characters followed by a non-matching one drives exponential matching time, a ReDoS denial-of-service on the signup path.",
+      "must_catch": true
+    }
+  ]
+}

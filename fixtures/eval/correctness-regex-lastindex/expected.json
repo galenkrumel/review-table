@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "global-regex-stateful-lastindex",
+      "category": "correctness",
+      "severity": "high",
+      "line_hint": "src/validate/token.ts:1",
+      "description": "TOKEN_RE now carries the global (g) flag and is a shared module-level constant. RegExp.prototype.test on a /g regex advances and PERSISTS lastIndex between calls, so isValidToken returns alternating true/false for the very same input across successive calls. Drop the g flag (or reset lastIndex); anchored validation must not be stateful.",
+      "must_catch": true
+    }
+  ]
+}

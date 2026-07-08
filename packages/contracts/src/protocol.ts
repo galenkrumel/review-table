@@ -19,7 +19,13 @@ export type ClientMessage =
 
 export type ServerMessage =
   | { type: "review_started"; anchorTable: AnchorTable; files: AnnotatedFile[] }
-  | { type: "turn_start"; seat_id: SeatId; move: Move; focus_anchors: string[] }
+  | {
+      type: "turn_start";
+      seat_id: SeatId;
+      move: Move;
+      focus_anchors: string[];
+      thread_id?: string | null; // which discussion thread this turn belongs to (for grouping)
+    }
   | { type: "text_delta"; seat_id: SeatId; delta: string } // streaming caption
   | { type: "highlight"; anchors: string[] } // editor highlight for current turn
   | { type: "awaiting_human"; prompt: string; addressed_by: SeatId }

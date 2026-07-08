@@ -1,0 +1,16 @@
+diff --git a/src/reports/orders.ts b/src/reports/orders.ts
+index 3f4a100..3f4a101 100644
+--- a/src/reports/orders.ts
++++ b/src/reports/orders.ts
+@@ -8,8 +8,12 @@ import { toRow } from "./row";
+ // Build one report row per order id.
+ export async function buildReport(orderIds: string[]): Promise<Row[]> {
+-  const orders = await db.orders.findMany({ where: { id: { in: orderIds } } });
+-  return orders.map(toRow);
++  const rows: Row[] = [];
++  for (const id of orderIds) {
++    const order = await db.orders.findUnique({ where: { id } });
++    rows.push(toRow(order));
++  }
++  return rows;
+ }

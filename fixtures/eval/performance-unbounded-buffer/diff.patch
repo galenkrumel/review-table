@@ -1,0 +1,15 @@
+diff --git a/src/upload/read-body.ts b/src/upload/read-body.ts
+index 7a8b100..7a8b101 100644
+--- a/src/upload/read-body.ts
++++ b/src/upload/read-body.ts
+@@ -5,11 +5,9 @@ import { PayloadTooLargeError } from "./errors";
+ export async function readBody(stream: AsyncIterable<Buffer>, limit: number): Promise<Buffer> {
+   const chunks: Buffer[] = [];
+   let size = 0;
+   for await (const chunk of stream) {
+-    size += chunk.length;
+-    if (size > limit) throw new PayloadTooLargeError();
+     chunks.push(chunk);
+   }
+   return Buffer.concat(chunks);
+ }

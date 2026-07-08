@@ -1,0 +1,13 @@
+diff --git a/src/cache/lookup.ts b/src/cache/lookup.ts
+index 7777777..8888888 100644
+--- a/src/cache/lookup.ts
++++ b/src/cache/lookup.ts
+@@ -10,7 +10,6 @@ import { applyTax } from "./tax";
+ export function priceFor(sku: string): number {
+   const entry = priceMap.get(sku);
+-  if (!entry) {
+-    return 0;
+-  }
+-  return entry.price;
++  return entry.price * applyTax(entry.region);
+ }

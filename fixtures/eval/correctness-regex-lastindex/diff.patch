@@ -1,0 +1,12 @@
+diff --git a/src/validate/token.ts b/src/validate/token.ts
+index 1111111..2222222 100644
+--- a/src/validate/token.ts
++++ b/src/validate/token.ts
+@@ -1,6 +1,6 @@
+-const TOKEN_RE = /^[a-z][a-z0-9_]*$/;
++const TOKEN_RE = /^[a-z][a-z0-9_]*$/g;
+
+ /** True if `name` is a valid lowercase identifier token. */
+ export function isValidToken(name: string): boolean {
+   return TOKEN_RE.test(name);
+ }

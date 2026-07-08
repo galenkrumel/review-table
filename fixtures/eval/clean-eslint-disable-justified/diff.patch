@@ -1,0 +1,14 @@
+diff --git a/src/config/load.ts b/src/config/load.ts
+index 8b9c100..8b9c101 100644
+--- a/src/config/load.ts
++++ b/src/config/load.ts
+@@ -2,6 +2,9 @@ import { assertEnv } from "./assert-env";
+ // assertEnv() runs at process boot and throws if any required var is missing,
+ // so by the time loadConfig() is called these are guaranteed present.
+ export function loadConfig(): Config {
++  assertEnv(["DATABASE_URL"]);
++  // Verified present by assertEnv above; the non-null assertion is safe here.
++  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+   const dbUrl = process.env.DATABASE_URL!;
+   return { dbUrl };
+ }

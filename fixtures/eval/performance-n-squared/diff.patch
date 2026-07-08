@@ -1,0 +1,17 @@
+diff --git a/src/report/dedupe.ts b/src/report/dedupe.ts
+index eeeeee1..eeeeee2 100644
+--- a/src/report/dedupe.ts
++++ b/src/report/dedupe.ts
+@@ -8,11 +8,9 @@ import type { Row } from "./types";
+ export function uniqueIds(rows: Row[]): string[] {
+   const out: string[] = [];
+-  const seen = new Set<string>();
+   for (const r of rows) {
+-    if (!seen.has(r.id)) {
+-      seen.add(r.id);
++    if (!out.includes(r.id)) {
+       out.push(r.id);
+     }
+   }
+   return out;
+ }

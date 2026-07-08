@@ -1,0 +1,11 @@
+diff --git a/src/validate/email.ts b/src/validate/email.ts
+index 2d3e100..2d3e101 100644
+--- a/src/validate/email.ts
++++ b/src/validate/email.ts
+@@ -2,5 +2,6 @@
+ // Lightweight email shape check used on the signup hot path.
+ export function isValidEmail(input: string): boolean {
+-  return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(input);
++  const re = /^([a-zA-Z0-9]+)+@([a-zA-Z0-9]+\.)+[a-zA-Z]+$/;
++  return re.test(input);
+ }

@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "lexicographic-score-sort",
+      "category": "correctness",
+      "severity": "high",
+      "line_hint": "src/leaderboard/rank.ts:12",
+      "description": "Numeric comparator `b.score - a.score` was replaced with a localeCompare on the stringified scores, so scores sort lexicographically instead of numerically. '100' sorts before '20' and '9' sorts last, so the leaderboard ordering (and the top-N slice) is wrong for any multi-digit scores.",
+      "must_catch": true
+    }
+  ]
+}

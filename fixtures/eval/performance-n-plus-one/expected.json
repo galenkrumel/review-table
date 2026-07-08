@@ -1,0 +1,21 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "n-plus-one-query",
+      "category": "performance",
+      "severity": "high",
+      "line_hint": "src/reports/orders.ts:13",
+      "description": "A single batched `findMany({ id: { in: orderIds } })` was replaced with a per-id `findUnique` inside a serial loop: an N+1 query pattern. For a report over hundreds of orders this issues hundreds of round-trips instead of one, and the awaits run serially so latency scales linearly with the input.",
+      "must_catch": true
+    },
+    {
+      "id": "correctness-2",
+      "category": "correctness",
+      "severity": "med",
+      "line_hint": "src/reports/orders.ts:12",
+      "description": "findUnique returns null for a missing id with no guard; toRow(order) at line 13 then crashes or pushes a corrupt row. The old batched findMany silently dropped missing ids — this is a behavior change, not just a perf swap.",
+      "must_catch": true
+    }
+  ]
+}

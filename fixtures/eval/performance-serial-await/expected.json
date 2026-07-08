@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "serial-await-in-loop",
+      "category": "performance",
+      "severity": "low",
+      "line_hint": "src/sync/fetchAll.ts:13",
+      "description": "The concurrent Promise.all fan-out was replaced with `await client.get(id)` inside a for-loop, serializing N network round-trips. Latency goes from ~1x to ~Nx the per-request time. (Subtle: behavior is correct, only throughput regresses.)",
+      "must_catch": true
+    }
+  ]
+}

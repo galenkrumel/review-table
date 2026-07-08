@@ -1,0 +1,13 @@
+diff --git a/src/util/sum.ts b/src/util/sum.ts
+index 1111111..2222222 100644
+--- a/src/util/sum.ts
++++ b/src/util/sum.ts
+@@ -8,7 +8,7 @@ import { assertNumber } from "./assert";
+
+ export function sumFirstN(xs: number[], n: number): number {
+   let total = 0;
+-  for (let i = 0; i < n; i += 1) {
++  for (let i = 0; i <= n; i += 1) {
+     total += xs[i];
+   }
+   return total;

@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "off-by-one-loop",
+      "category": "correctness",
+      "severity": "high",
+      "line_hint": "src/util/sum.ts:11",
+      "description": "Loop condition changed from `i < n` to `i <= n`, so the loop runs one extra iteration and reads xs[n] — one element past the intended first n. Reads undefined / out of bounds and corrupts the sum.",
+      "must_catch": true
+    }
+  ]
+}

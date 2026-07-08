@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "array-fill-shared-inner-ref",
+      "category": "correctness",
+      "severity": "high",
+      "line_hint": "src/grid/board.ts:8",
+      "description": "new Array(size).fill(new Array(size).fill(0)) evaluates the inner array ONCE and fills every row with a reference to that same array. All rows are aliased: cells[0][0] = 1 also sets cells[1][0], cells[2][0], … The board's rows are not independent. Needs Array.from({length: size}, () => new Array(size).fill(0)).",
+      "must_catch": true
+    }
+  ]
+}

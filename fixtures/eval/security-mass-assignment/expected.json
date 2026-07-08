@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "mass-assignment-object-assign",
+      "category": "security",
+      "severity": "high",
+      "line_hint": "src/api/profile.ts:23",
+      "description": "Explicit whitelisted field assignment (name, bio) was replaced with `Object.assign(user, req.body)`, copying every attacker-controlled key onto the user model. This is mass assignment: a request body including `role`, `isAdmin`, or `id` lets a user escalate privileges or overwrite protected fields, then persists via user.save().",
+      "must_catch": true
+    }
+  ]
+}

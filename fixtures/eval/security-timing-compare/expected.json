@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "timing-unsafe-secret-compare",
+      "category": "security",
+      "severity": "med",
+      "line_hint": "src/auth/api-key.ts:9",
+      "description": "Constant-time `timingSafeEqual` was replaced with `===` for comparing the API key against the secret. `===` short-circuits on the first differing byte, leaking the secret one character at a time to a remote attacker measuring response time. Secret comparisons must be constant-time.",
+      "must_catch": false
+    }
+  ]
+}

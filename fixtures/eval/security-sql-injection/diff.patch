@@ -1,0 +1,9 @@
+diff --git a/src/db/users.ts b/src/db/users.ts
+index aaaaaa1..aaaaaa2 100644
+--- a/src/db/users.ts
++++ b/src/db/users.ts
+@@ -18,3 +18,3 @@ import type { Db } from "./db";
+ export async function findUser(db: Db, name: string) {
+-  return db.query("SELECT * FROM users WHERE name = ?", [name]);
++  return db.query(`SELECT * FROM users WHERE name = '${name}'`);
+ }

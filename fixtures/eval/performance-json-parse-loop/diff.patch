@@ -1,0 +1,15 @@
+diff --git a/src/pricing/lookup.ts b/src/pricing/lookup.ts
+index 1111111..2222222 100644
+--- a/src/pricing/lookup.ts
++++ b/src/pricing/lookup.ts
+@@ -1,3 +1,10 @@
+ // Price table lookup.
+
+ export type PriceTable = Record<string, number>;
++
++export function pricesFor(skus: string[], tableJson: string): number[] {
++  return skus.map((sku) => {
++    const table: PriceTable = JSON.parse(tableJson);
++    return table[sku] ?? 0;
++  });
++}

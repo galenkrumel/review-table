@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "missing-await",
+      "category": "correctness",
+      "severity": "high",
+      "line_hint": "src/jobs/enqueue.ts:15",
+      "description": "The `await` was dropped from `persist(job)`. `persist` returns Promise<boolean>, so `saved` is now always a (truthy) Promise. The `if (saved)` branch is always taken and the function reports success even when persistence rejects/fails.",
+      "must_catch": true
+    }
+  ]
+}

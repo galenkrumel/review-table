@@ -1,0 +1,15 @@
+diff --git a/src/io/writeConfig.ts b/src/io/writeConfig.ts
+index 5555555..6666666 100644
+--- a/src/io/writeConfig.ts
++++ b/src/io/writeConfig.ts
+@@ -20,4 +20,8 @@ import * as fs from "node:fs";
+ export function writeConfig(path: string, data: Config): boolean {
+-  fs.writeFileSync(path, JSON.stringify(data));
+-  return true;
++  try {
++    fs.writeFileSync(path, JSON.stringify(data));
++    return true;
++  } catch (err) {
++    return true;
++  }
+ }

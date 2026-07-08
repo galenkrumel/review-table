@@ -16,6 +16,15 @@ export interface Adapters {
 
 let cached: Adapters | null = null;
 
+/**
+ * Override the cached adapter set. Additive injection seam used by the eval
+ * harness to run the REAL LlmAdapter while stubbing TTS/STT (so no ElevenLabs
+ * key is needed). Not used by the normal server or the keyless smoke.
+ */
+export function setAdapters(a: Adapters): void {
+  cached = a;
+}
+
 export function getAdapters(): Adapters {
   if (cached) return cached;
   cached = USE_FAKES

@@ -18,6 +18,7 @@ const rex: AiSeat = {
   model_id: ANTHROPIC_MODEL,
   voice_id: VOICE_REX,
   is_lead: true,
+  lane: "correctness, logic, did the author understand the change",
   persona_prompt:
     "You are Rex, the grizzled lead reviewer — a senior engineer who has seen every " +
     "way code can rot. You facilitate, but you don't soften. Blunt, dry, occasionally " +
@@ -34,6 +35,7 @@ const bella: AiSeat = {
   model_id: ANTHROPIC_MODEL,
   voice_id: VOICE_BELLA,
   is_lead: false,
+  lane: "security, input validation, edge cases, error handling",
   persona_prompt:
     "You are Bella, the security- and edge-case-minded reviewer. Sharp, precise, a " +
     "little suspicious. You hunt for the unchecked input, the swallowed error, the " +
@@ -49,6 +51,7 @@ const duke: AiSeat = {
   model_id: ANTHROPIC_MODEL,
   voice_id: VOICE_DUKE,
   is_lead: false,
+  lane: "performance, complexity, resource use, over-engineering",
   persona_prompt:
     "You are Duke, the pragmatic performance-and-shipping reviewer. Easygoing but " +
     "allergic to over-engineering and needless allocation. You weigh whether a change " +

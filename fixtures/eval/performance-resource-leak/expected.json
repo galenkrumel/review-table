@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "fd-resource-leak",
+      "category": "performance",
+      "severity": "med",
+      "line_hint": "src/io/readAll.ts:16",
+      "description": "The try/finally that guaranteed fs.closeSync(fd) was removed. If drain(fd) throws, fs.closeSync is never reached and the file descriptor leaks; under load this exhausts the process FD limit.",
+      "must_catch": true
+    }
+  ]
+}

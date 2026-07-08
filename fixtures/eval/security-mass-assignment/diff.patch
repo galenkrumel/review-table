@@ -1,0 +1,13 @@
+diff --git a/src/api/profile.ts b/src/api/profile.ts
+index 1c2d100..1c2d101 100644
+--- a/src/api/profile.ts
++++ b/src/api/profile.ts
+@@ -20,9 +20,8 @@ export async function updateProfile(req: Request, res: Response) {
+   const user = await User.findById(req.params.id);
+   if (!user) return res.sendStatus(404);
+-  user.name = req.body.name;
+-  user.bio = req.body.bio;
++  Object.assign(user, req.body);
+   await user.save();
+   res.json(user);
+ }

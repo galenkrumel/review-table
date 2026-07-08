@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "prototype-pollution-merge",
+      "category": "security",
+      "severity": "high",
+      "line_hint": "src/util/merge.ts:6",
+      "description": "The guard skipping `__proto__` and `constructor` keys was removed from a recursive merge driven by attacker-controlled `source` (e.g. a parsed JSON request body). A payload like {\"__proto__\":{\"isAdmin\":true}} now writes onto Object.prototype, a prototype-pollution vulnerability affecting every object in the process.",
+      "must_catch": true
+    }
+  ]
+}
