@@ -105,8 +105,10 @@ at sane effort, and weakening the panel to Sonnet buys nothing here (Sonnet is a
 - **Pivot the improvement work** to axes with real headroom, all computable from the transcripts the
   harness already captures:
   - *Orchestration / floor control* — turn balance across dogs, lane-routing accuracy (security→Bella,
-    perf→Duke, correctness→Rex), hunk coverage, anti-agreeableness (pushback before resolve). Headroom
-    already evidenced by the opener-bias toward Rex.
+    perf→Duke, correctness→Rex), hunk coverage, anti-agreeableness (pushback before resolve).
+    _Hypothesis: an opener-bias toward Rex and lane mis-routing leave headroom here — **tested and
+    largely falsified in Entry 2**, which measured the opposite (Bella opens most; Rex leads only by
+    closing) and effectively clean routing._
   - *Persona distinctiveness* — blind attribution of unlabeled lines to the right dog (tests the
     "personas must not collapse into one voice" invariant).
 
@@ -115,5 +117,64 @@ confirm the headroom is real before spending on a live baseline.
 
 ---
 
-<!-- Add Entry 2 below (first orchestration/persona experiment). Keep the shape above. -->
+## Entry 2 — Where's the real headroom? Free structural readout + persona probe — 2026-07-07
+
+**Config:** measured over the 48 cached transcripts (42 `claude-opus-4-8`, 6 `claude-sonnet-5`) from
+Entries 0–1. Structural readout is deterministic and **free** (`$0`); the persona probe is one
+`claude-sonnet-5` judge pass (~$0.12). No fresh dog runs.
+
+**Intent.** Entry 1 pivoted from recall to orchestration + persona but assumed the orchestration
+headroom without measuring it. Before spending on a live baseline, measure the cheap proxies first —
+same discipline as Entry 1 (probe before you build).
+
+**Result A — orchestration structural metrics are saturated/confounded (the pivot's own premise
+fails).** All computed for free from the transcripts:
+
+| Metric | Value | Read |
+| --- | --- | --- |
+| Floor balance (turn share) | Rex 37.6% · Duke 32.9% · Bella 29.5% | healthy — **0 cases** where any dog stayed silent |
+| Thread openers (`raise_issue`) | **Bella 47 · Rex 34 · Duke 21** | Entry 1's "opener-bias toward Rex" is **backwards** — Bella opens most |
+| Thread closers (`close`) | **Rex 48 / 48 (100%)** | Rex's higher turn-share is his *lead/closer role by design*, not floor-hogging |
+| Lane-opening routing | 41/47 in-lane (87%) | all **6** "misses" are genuinely cross-lane (error-handling/edge-case issues that fall in Bella's lane, or multi-issue fixtures) → effective director-error rate ≈ 0 |
+| Anti-agreeableness | 101/101 threads had pushback | saturated — the turn-loop always scripts a pushback beat; too coarse to grade |
+
+So the cheaply-measurable orchestration axes are as flat as recall was. **The correction matters:** the
+data falsifies my own Entry-1 premise. Rex dominates *closing*, not *opening* — and the director routes
+the right lane essentially every time once you account for issues that legitimately straddle two lanes.
+
+**Result B — persona distinctiveness is the axis with real headroom.** Blind attribution: strip 524
+dog lines of speaker/move/context (drop `close` — a role tell, not a voice tell), shuffle across cases,
+ask the judge to attribute each to Rex/Bella/Duke from the three real persona prompts alone.
+
+| | Accuracy |
+| --- | --- |
+| **Overall** | **54.4%** |
+| Random floor | 33.3% |
+| Majority-class floor | 35.9% |
+
+Per-dog recall: **Bella 71%** · Rex 48% · Duke 45%. Confusion is structured, not uniform: **Rex and Duke
+blur into each other** (74 cross-confusions) and both bleed into Bella (the judge over-predicts Bella —
+precision 51%). Read: the invariant **holds** (voices are well above the collapse floor — not one voice),
+but only Bella is *sharply* distinct; Rex (gruff-correctness) and Duke (pragmatic-performance) sound too
+alike. That is a concrete, gradeable weak spot a persona-prompt change can move.
+
+**Cost:** ~$0.12 (structural readout $0; one Sonnet persona-attribution pass). Cached per line, so
+re-scoring is free.
+
+**Caveats (kept honest).** 100% attribution isn't the ceiling — some lines are genuinely generic
+("Bella's right, and it's worse"). One judge, one pass (non-determinism not yet sampled). Part of the
+54% is lane *content* leaking into attribution, not pure style — but the Rex↔Duke blur shows their
+styles are close even when content differs. The transcript lineup is mixed-model (42 Opus / 6 Sonnet);
+a clean persona baseline should freeze to one model.
+
+**Decision.** Make **persona distinctiveness** the improvement axis; **orchestration joins recall as a
+guardrail** (both measured, both flat — regressions still visible, but not where the gain is).
+
+**Next:** freeze a single-model persona baseline (modal of a few judge passes to tame non-determinism),
+then sharpen the Rex/Duke persona prompts to separate their voices and re-measure the attribution
+accuracy — the first real intervention with a number to move.
+
+---
+
+<!-- Add Entry 3 below (first persona intervention). Keep the shape above. -->
 
