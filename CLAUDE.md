@@ -40,6 +40,14 @@ This is a working MVP — it runs end-to-end with or without API keys.
   `pnpm --filter @review-table/server test -- -t "name"`.
 - `pnpm --filter @review-table/server smoke` — keyless end-to-end run of the full
   turn loop (`USE_FAKES=1`); verifies orchestration with no API keys or cost.
+- `pnpm eval` — LLM-as-judge eval: drives the real review over the labeled diffs in
+  `fixtures/eval/` and scores catch-rate (recall). A plain run re-scores from cached
+  transcripts for **free**; `--fresh` re-runs live and **costs money** (real Anthropic
+  calls, needs `ANTHROPIC_API_KEY`). Pass flags through `--`, e.g.
+  `pnpm eval -- --fresh --label="…"`. `pnpm eval:check` validates the ground-truth
+  files. Full flag list is the header comment in `apps/server/src/eval/run-eval.ts`;
+  what it measures and why precision isn't scored is in `docs/EVAL.md`. Recall is the
+  scored metric; extra findings are tracked descriptively, never graded.
 - `pnpm build` — `tsc` build across packages.
 
 Runs keyless by default: with `ANTHROPIC_API_KEY`/`ELEVENLABS_API_KEY` absent (or

@@ -85,6 +85,7 @@ docs/                 # architecture notes + the scene image
 ## Docs
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — the turn loop, floor control, audio/lip-sync, anchoring
+- [`docs/EVAL.md`](docs/EVAL.md) — the eval harness: what it measures (recall) and why precision isn't scored
 - [`packages/contracts/src`](packages/contracts/src) — the authoritative wire/format schemas and interfaces, in code
 
 ## Tests
@@ -99,6 +100,20 @@ Unit tests cover the anchoring/diff logic (`packages/anchoring`) and the server'
 rules, anti-agreeableness gate, and addressing logic (`apps/server/test`). The full turn
 loop and the human-interject path are exercised by the keyless `smoke` script. The client
 is verified by typecheck + manual browser passes.
+
+## Evals
+
+```bash
+pnpm eval                         # score from cached transcripts (free, no API calls)
+pnpm eval -- --fresh --label="…"  # re-run the review live (needs ANTHROPIC_API_KEY; costs money)
+pnpm eval:check                   # validate the ground-truth fixtures
+```
+
+The eval drives the real multi-dog review over a labeled set of diffs in `fixtures/eval/`
+and measures **catch-rate (recall)** — did the dogs surface the planted bugs? Recall is the
+scored metric; extra (non-ground-truth) findings are tracked descriptively, not graded — see
+[`docs/EVAL.md`](docs/EVAL.md) for the reasoning. Results land in `EVAL-REPORT.md` (latest run,
+gitignored) and the running baseline→change narrative [`EVAL-LOG.md`](EVAL-LOG.md).
 
 ## Credits
 
