@@ -176,5 +176,46 @@ accuracy — the first real intervention with a number to move.
 
 ---
 
-<!-- Add Entry 3 below (first persona intervention). Keep the shape above. -->
+## Entry 3 — Frozen persona baseline (the reference interventions compare against) — 2026-07-07
+
+**Config:** dogs `claude-opus-4-8` (the 42 Opus transcripts; the 6 Sonnet `hard-*` excluded) · judge
+`claude-sonnet-5` · **modal of 3 judge passes** · 403 dog lines (`close` excluded).
+
+**Why this, not Entry 2's number.** Entry 2's 54.4% was an *exploratory* single pass over a mixed-model
+(42 Opus / 6 Sonnet) transcript set. A reference line that later interventions can be compared against
+has to lock the protocol: **one dog-model** (the subject under test, not a blend) and the **modal of 3
+judge passes** to tame the judge's own non-determinism. This is that frozen line.
+
+**Result — the baseline to beat:**
+
+| Metric | Value |
+| --- | --- |
+| **MODAL attribution accuracy** | **57.6%** |
+| Random floor | 33.3% |
+| Majority-class floor | 36.0% |
+| Per-run accuracy | 55.8% / 58.6% / 55.8% (≈2.8pt spread) |
+| Judge self-agreement | unanimous on **74%** of lines |
+
+Per-dog recall: **Bella 78%** · Rex 50% · **Duke 46%**. Confusion is lopsided: Bella barely leaks (only
+30/134 of her lines misattributed), while **Duke scatters almost evenly to Bella (46) and Rex (33)** and
+Rex bleeds mostly to Bella (45). The modal changes the headline by ≤2pt vs any single run but removes the
+coin-flip on the ~26% of lines the judge wavered on — which is the point of sampling.
+
+**Reading.** The invariant holds — 57.6% is ~22pt over the majority-class floor, so the three are
+demonstrably *not* one voice. But **the distinctiveness is carried almost entirely by Bella.** Rex
+(gruff-correctness lead) and Duke (pragmatic-performance) are the collapsed pair.
+
+**Cost:** ~$0.20 (judge runs 1–2; run 0 was free from Entry 2's cache). Re-scoring is free.
+
+**Guardrails unchanged:** recall (Entry 1) and orchestration (Entry 2) remain flat — regressions would
+still show, but the movement to chase is here.
+
+**Next — the first real intervention.** Sharpen the Rex and Duke persona prompts (`apps/server/src/
+config.ts`) to separate their voices — Rex terse/correctness-first, Duke performance/tradeoff-first —
+without touching Bella, then re-run this exact protocol (`EVAL_PERSONA_RUNS=3`, Opus-only) and read the
+modal + per-dog recall. Target: lift Duke and Rex recall without collapsing Bella.
+
+---
+
+<!-- Add Entry 4 below (first persona intervention result). Keep the shape above. -->
 

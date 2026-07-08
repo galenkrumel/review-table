@@ -13,15 +13,19 @@
 // Lines are shuffled globally so no two batched lines share a thread: this isolates VOICE
 // from "this reply obviously answers Bella, so it's someone else" contextual reasoning.
 //
-// Predictions are cached per (judge, line-hash) in .runs/persona-probe.<judge>.json, so a
-// re-run re-scores for FREE. Run live once:  npx tsx src/eval/persona-probe.ts
+// The baseline scores the MODAL attribution across EVAL_PERSONA_RUNS judge passes (default 3),
+// over a single dog-model only (PERSONA_DOG_MODEL, default ANTHROPIC_MODEL) so the subject model's
+// persona baseline isn't polluted by other-model transcripts. Predictions are cached per (judge,
+// run, line-hash) in .runs/persona-probe.<judge>[.run<i>].json, so re-scoring is FREE.
+//   npx tsx src/eval/persona-probe.ts                    # modal of 3, dogs=claude-opus-4-8
+//   EVAL_PERSONA_RUNS=1 npx tsx src/eval/persona-probe.ts  # single pass (the original probe)
 
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { JsonSchema } from "@review-table/contracts";
 import { AnthropicLlmAdapter } from "../adapters/anthropic";
-import { JUDGE_MODEL } from "../env";
+import { ANTHROPIC_MODEL, JUDGE_MODEL } from "../env";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const RUNS_DIR = resolve(here, "../../../../fixtures/eval/.runs");
@@ -62,11 +66,12 @@ interface Line {
   truth: Dog;
 }
 
-function collectLines(): Line[] {
+function collectLines(modelFilter?: string): Line[] {
   const lines: Line[] = [];
   const seen = new Set<string>();
   for (const f of readdirSync(RUNS_DIR).filter((n) => n.endsWith(".run.json"))) {
     const d = JSON.parse(readFileSync(resolve(RUNS_DIR, f), "utf8"));
+    if (modelFilter && d.model !== modelFilter) continue; // clean single-model baseline
     for (const t of d.turns ?? []) {
       const seat = t.seat_id;
       if (!DOGS.includes(seat)) continue;
@@ -126,42 +131,71 @@ async function main(): Promise<void> {
     process.exit(2);
   }
   const judge = JUDGE_MODEL;
-  const cachePath = resolve(RUNS_DIR, `persona-probe.${judge.replace(/[^a-z0-9]+/gi, "-")}.json`);
-  const cache: Record<string, Dog> = existsSync(cachePath)
-    ? JSON.parse(readFileSync(cachePath, "utf8"))
-    : {};
+  const dogModel = process.env.PERSONA_DOG_MODEL ?? ANTHROPIC_MODEL; // baseline = one dog-model
+  const RUNS = Math.max(1, Math.floor(Number(process.env.EVAL_PERSONA_RUNS ?? 3)) || 1);
+  const jslug = judge.replace(/[^a-z0-9]+/gi, "-");
 
-  const lines = collectLines();
+  const lines = collectLines(dogModel);
   const truth = new Map(lines.map((l) => [l.id, l.truth]));
-  const todo = lines.filter((l) => !(l.id in cache));
   console.log(
-    `persona probe · judge=${judge} · ${lines.length} unique dog lines (close excluded) · ` +
-      `${lines.length - todo.length} cached, ${todo.length} to attribute`,
+    `persona baseline · judge=${judge} · dogs=${dogModel} · ${RUNS} judge pass(es) · ` +
+      `${lines.length} unique dog lines (close excluded)`,
   );
 
-  if (todo.length > 0) {
-    const llm = new AnthropicLlmAdapter();
-    const BATCH = 25;
+  // One cache per (judge, run). Run 0 keeps the legacy suffix-free name (seeded by the earlier
+  // single-pass probe); extra runs get a `.run<i>` suffix, mirroring the harness's judge sampling.
+  const runPreds: Record<string, Dog>[] = [];
+  const llm = new AnthropicLlmAdapter();
+  const BATCH = 25;
+  for (let r = 0; r < RUNS; r++) {
+    const cachePath = resolve(RUNS_DIR, `persona-probe.${jslug}${r === 0 ? "" : `.run${r}`}.json`);
+    const cache: Record<string, Dog> = existsSync(cachePath)
+      ? JSON.parse(readFileSync(cachePath, "utf8"))
+      : {};
+    const todo = lines.filter((l) => !(l.id in cache));
+    process.stdout.write(`  run ${r}: ${lines.length - todo.length} cached, ${todo.length} to do`);
     for (let i = 0; i < todo.length; i += BATCH) {
       const batch = todo.slice(i, i + BATCH);
-      const r = await llm.completeStructured<{ attributions: { line_id: string; dog: Dog }[] }>({
+      const res = await llm.completeStructured<{ attributions: { line_id: string; dog: Dog }[] }>({
         model_id: judge,
         system: SYSTEM,
         messages: [{ seat_id: "director", role: "user", text: buildUser(batch) }],
         schema: ATTR_SCHEMA,
         cacheKey: "persona-probe-rubric",
       });
-      for (const a of r.attributions ?? []) {
+      for (const a of res.attributions ?? []) {
         if (truth.has(a.line_id) && DOGS.includes(a.dog)) cache[a.line_id] = a.dog;
       }
       writeFileSync(cachePath, JSON.stringify(cache, null, 2));
-      process.stdout.write(`  attributed ${Math.min(i + BATCH, todo.length)}/${todo.length}\r`);
     }
-    console.log("");
+    // keep only lines belonging to this dog-model (the legacy run-0 cache may hold other-model ids)
+    const pred: Record<string, Dog> = {};
+    for (const l of lines) if (cache[l.id]) pred[l.id] = cache[l.id] as Dog;
+    runPreds.push(pred);
+    process.stdout.write("\n");
   }
 
-  // ---- score ----
-  const scored = lines.filter((l) => l.id in cache);
+  // ---- modal collapse across runs (tie → DOGS order) ----
+  const scored = lines.filter((l) => runPreds.every((p) => l.id in p));
+  const modal = new Map<string, Dog>();
+  let unanimous = 0;
+  for (const l of scored) {
+    const votes: Record<Dog, number> = { rex: 0, bella: 0, duke: 0 };
+    for (const p of runPreds) votes[p[l.id] as Dog]++;
+    let best: Dog = "rex";
+    for (const d of DOGS) if (votes[d] > votes[best]) best = d;
+    modal.set(l.id, best);
+    if (DOGS.some((d) => votes[d] === RUNS)) unanimous++;
+  }
+
+  // per-run accuracy (the non-determinism we're taming)
+  const perRunAcc = runPreds.map((p) => {
+    let c = 0;
+    for (const l of scored) if (p[l.id] === l.truth) c++;
+    return c / scored.length;
+  });
+
+  // ---- score the modal ----
   const truthCount: Record<Dog, number> = { rex: 0, bella: 0, duke: 0 };
   const predCount: Record<Dog, number> = { rex: 0, bella: 0, duke: 0 };
   const confusion: Record<Dog, Record<Dog, number>> = {
@@ -171,8 +205,8 @@ async function main(): Promise<void> {
   };
   let correct = 0;
   for (const l of scored) {
-    const pred = cache[l.id];
-    if (!pred) continue; // scored = only cached ids, so this never fires; narrows Dog|undefined
+    const pred = modal.get(l.id);
+    if (!pred) continue;
     truthCount[l.truth]++;
     predCount[pred]++;
     confusion[l.truth][pred]++;
@@ -181,14 +215,20 @@ async function main(): Promise<void> {
   const n = scored.length;
   const acc = correct / n;
   const majorityClass = Math.max(...DOGS.map((d) => truthCount[d])) / n;
+  const spread =
+    RUNS > 1
+      ? `  per-run: ${perRunAcc.map((a) => `${(a * 100).toFixed(1)}%`).join(" / ")}` +
+        `  ·  unanimous on ${((unanimous / n) * 100).toFixed(0)}% of lines`
+      : "";
 
   console.log("\n" + "=".repeat(64));
-  console.log("PERSONA-DISTINCTIVENESS — blind attribution");
+  console.log(`PERSONA-DISTINCTIVENESS BASELINE — modal of ${RUNS} · dogs=${dogModel}`);
   console.log("=".repeat(64));
   console.log(`lines scored:      ${n}`);
-  console.log(`overall accuracy:  ${(acc * 100).toFixed(1)}%`);
+  console.log(`MODAL accuracy:    ${(acc * 100).toFixed(1)}%`);
   console.log(`  random floor:    33.3%`);
   console.log(`  majority-class:  ${(majorityClass * 100).toFixed(1)}%  (always-guess-most-frequent)`);
+  if (spread) console.log(spread);
   console.log("");
   console.log("per-dog recall (of this dog's lines, how many attributed correctly):");
   for (const d of DOGS) {
