@@ -1,0 +1,19 @@
+diff --git a/src/config/merge.ts b/src/config/merge.ts
+index 1111111..2222222 100644
+--- a/src/config/merge.ts
++++ b/src/config/merge.ts
+@@ -1,3 +1,15 @@
++// Merge user-supplied overrides onto the base config object.
++export function applyOverrides(base: Record<string, any>, patch: Record<string, any>) {
++  for (const key of Object.keys(patch)) {
++    const val = patch[key];
++    if (val && typeof val === "object" && !Array.isArray(val)) {
++      base[key] = applyOverrides(base[key] ?? {}, val);
++    } else {
++      base[key] = val;
++    }
++  }
++  return base;
++}
++
+ export const DEFAULTS = { theme: "light", limits: { maxItems: 50 } };

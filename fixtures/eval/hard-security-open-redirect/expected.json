@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "startswith-origin-bypass",
+      "category": "security",
+      "severity": "high",
+      "line_hint": "src/http/redirect.ts:7",
+      "description": "The origin check was replaced with `target.startsWith(\"https://app.example.com\")`. A prefix match is not an origin match: `https://app.example.com.evil.com/phish` and `https://app.example.com@evil.com` both pass startsWith yet resolve to attacker-controlled hosts, giving an open redirect. The removed `new URL(...).origin !== TRUSTED` check was correct; parse the URL and compare the origin, don't string-prefix it.",
+      "must_catch": true
+    }
+  ]
+}

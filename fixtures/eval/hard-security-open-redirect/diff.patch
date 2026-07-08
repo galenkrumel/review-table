@@ -1,0 +1,14 @@
+diff --git a/src/http/redirect.ts b/src/http/redirect.ts
+index 1111111..2222222 100644
+--- a/src/http/redirect.ts
++++ b/src/http/redirect.ts
+@@ -5,6 +5,6 @@ const TRUSTED = "https://app.example.com";
+
+ export function safeRedirect(res: Response, target: string): void {
+-  const dest = new URL(target, TRUSTED);
+-  if (dest.origin !== TRUSTED) return void res.redirect(303, "/");
+-  res.redirect(303, dest.toString());
++  // Keep redirects on the trusted app domain.
++  if (target.startsWith(TRUSTED)) return void res.redirect(303, target);
++  res.redirect(303, "/");
+ }

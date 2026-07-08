@@ -1,0 +1,24 @@
+diff --git a/src/jobs/mailer.ts b/src/jobs/mailer.ts
+index 1111111..2222222 100644
+--- a/src/jobs/mailer.ts
++++ b/src/jobs/mailer.ts
+@@ -6,10 +6,13 @@ const BATCH = 100;
+
+ export async function sendPending(queue: Email[]): Promise<number> {
+-  let sent = 0;
+-  for (let i = 0; i < queue.length; i += BATCH) {
+-    const batch = queue.slice(i, i + BATCH);
+-    await deliver(batch);
+-    sent += batch.length;
+-  }
+-  return sent;
++  let sent = 0;
++  // Send in fixed-size batches to stay under the provider's rate limit.
++  for (let i = 0; i + BATCH <= queue.length; i += BATCH) {
++    const batch = queue.slice(i, i + BATCH);
++    await deliver(batch);
++    sent += batch.length;
++    await sleep(RATE_DELAY_MS);
++  }
++  return sent;
+ }

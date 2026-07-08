@@ -1,0 +1,28 @@
+diff --git a/src/config/store.ts b/src/config/store.ts
+index 1111111..2222222 100644
+--- a/src/config/store.ts
++++ b/src/config/store.ts
+@@ -1,14 +1,23 @@
+ import { db } from "../db";
+ import { logger } from "../logger";
+
++// In-memory cache to avoid a DB round-trip on every config read.
++const cache = new Map<string, Config>();
++
+ export async function getConfig(key: string): Promise<Config> {
++  const hit = cache.get(key);
++  if (hit) return hit;
+   const row = await db.configs.findOne({ key });
+   if (!row) throw new NotFoundError(`config ${key}`);
+-  return row.value;
++  cache.set(key, row.value);
++  return row.value;
+ }
+
+-export async function updateConfig(key: string, value: Config): Promise<void> {
++export async function updateConfig(key: string, value: Config, actor: string): Promise<void> {
+   validateConfig(value);
+   await db.configs.updateOne({ key }, { $set: { value } }, { upsert: true });
+-  logger.info(`config ${key} updated`);
++  logger.info(`config ${key} updated by ${actor}`);
+ }

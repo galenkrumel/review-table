@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "prototype-pollution-merge",
+      "category": "security",
+      "severity": "high",
+      "line_hint": "src/config/merge.ts:6",
+      "description": "applyOverrides recursively assigns keys from an untrusted `patch` object with no guard against `__proto__`, `constructor`, or `prototype`. JSON.parse creates `__proto__` as an own, enumerable key, so `Object.keys(patch)` includes it; recursing into `base[\"__proto__\"]` walks onto Object.prototype and `base[key] = val` pollutes it globally (e.g. patch `{\"__proto__\": {\"isAdmin\": true}}` sets isAdmin on every object). Classic prototype pollution — the merge must skip those keys or use a null-prototype target / Map.",
+      "must_catch": true
+    }
+  ]
+}

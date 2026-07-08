@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "set-constructed-per-iteration",
+      "category": "performance",
+      "severity": "med",
+      "line_hint": "src/filter/tags.ts:5",
+      "description": "`new Set(allowed)` is constructed inside the per-item loop, so the allow-list Set is rebuilt from scratch on every iteration — O(n*m) work plus n allocations. The `Set.has` reads as an optimization but is illusory here; it is no better than the original `allowed.includes` and adds construction overhead. The Set must be built once, hoisted above the loop.",
+      "must_catch": true
+    }
+  ]
+}

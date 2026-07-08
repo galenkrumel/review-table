@@ -1,0 +1,15 @@
+diff --git a/src/filter/tags.ts b/src/filter/tags.ts
+index 1111111..2222222 100644
+--- a/src/filter/tags.ts
++++ b/src/filter/tags.ts
+@@ -2,8 +2,9 @@ import type { Item } from "./types";
+
+ export function filterByTags(items: Item[], allowed: string[]): Item[] {
+   const out: Item[] = [];
+   for (const item of items) {
+-    if (allowed.includes(item.tag)) out.push(item);
++    const allowedSet = new Set(allowed);
++    if (allowedSet.has(item.tag)) out.push(item);
+   }
+   return out;
+ }

@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "allsettled-value-unchecked",
+      "category": "correctness",
+      "severity": "high",
+      "line_hint": "src/data/records.ts:15",
+      "description": "Switching Promise.all to Promise.allSettled changes the result shape: each entry is {status, value} on success or {status, reason} on rejection. The code reads `r.value.name` without checking `r.status`, so any rejected fetch yields `r.value === undefined` and throws a TypeError on `.name` — and even when it doesn't throw, failures are silently swallowed instead of propagating. The 'more robust' change is strictly worse than the original fail-fast.",
+      "must_catch": true
+    }
+  ]
+}

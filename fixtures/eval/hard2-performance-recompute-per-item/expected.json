@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "sort-recomputed-per-player",
+      "category": "performance",
+      "severity": "med",
+      "line_hint": "src/report/leaderboard.ts:7",
+      "description": "Extracting `rankOf` moved the `[...scores].sort(...)` inside a function that is called once per player in `players.map(...)`. The full scores array is now copied and sorted N times (O(n * m log m)) where the original sorted exactly once outside the loop (O(m log m + n*m)). The refactor reads as a clean helper extraction, but it turns a one-time sort into a per-item sort. Sort once and pass the ranked array (or a precomputed rank map) in.",
+      "must_catch": true
+    }
+  ]
+}

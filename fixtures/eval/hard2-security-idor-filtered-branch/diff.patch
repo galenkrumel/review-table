@@ -1,0 +1,21 @@
+diff --git a/src/api/documents.ts b/src/api/documents.ts
+index 1111111..2222222 100644
+--- a/src/api/documents.ts
++++ b/src/api/documents.ts
+@@ -10,4 +10,14 @@ export async function listDocuments(req: Request, res: Response) {
+   const userId = req.user.id;
+-  const docs = await db.documents.find({ ownerId: userId });
+-  res.json(docs);
++  const { folder, sort } = req.query;
++
++  // Support optional folder filtering and sorting.
++  const query: Filter = folder
++    ? { folderId: String(folder) }
++    : { ownerId: userId };
++
++  const docs = await db.documents
++    .find(query)
++    .sort({ [String(sort ?? "createdAt")]: -1 });
++
++  res.json(docs);
+ }

@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "parallel-lost-to-serial-retry",
+      "category": "performance",
+      "severity": "med",
+      "line_hint": "src/sync/replicate.ts:15",
+      "description": "The original pushed to all replicas concurrently via Promise.all. The refactor adds retry/backoff (the visible change) but does it inside a sequential `for...of` loop that `await`s each replica before starting the next, so total latency is now the sum of all replica round-trips instead of the max. The replicas are independent; the retry logic could be wrapped per-replica and still run in parallel (e.g. Promise.all over a retrying helper). The buried regression is the lost concurrency, not the retry itself.",
+      "must_catch": true
+    }
+  ]
+}

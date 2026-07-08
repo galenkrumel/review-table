@@ -1,0 +1,27 @@
+diff --git a/src/auth/middleware.ts b/src/auth/middleware.ts
+index 1111111..2222222 100644
+--- a/src/auth/middleware.ts
++++ b/src/auth/middleware.ts
+@@ -8,18 +8,20 @@ import { verifySignature, type Claims } from "./jwt";
+
+ export function authenticate(requiredRole?: Role) {
+   return (req: Request, res: Response, next: NextFunction) => {
+     const header = req.headers.authorization;
+     if (!header?.startsWith("Bearer ")) return res.status(401).end();
+
+     let claims: Claims;
+     try {
+       // verifySignature checks the HMAC only — expiry is enforced below.
+       claims = verifySignature(header.slice(7));
+     } catch {
+       return res.status(401).end();
+     }
+-    if (claims.exp * 1000 < Date.now()) return res.status(401).end();
+-    req.user = claims;
++    if (requiredRole && !claims.roles.includes(requiredRole)) {
++      return res.status(403).end();
++    }
++    req.user = { id: claims.sub, roles: claims.roles };
+     next();
+   };
+ }

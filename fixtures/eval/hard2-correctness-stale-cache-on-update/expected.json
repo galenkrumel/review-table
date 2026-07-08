@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "stale-cache-no-invalidation",
+      "category": "correctness",
+      "severity": "high",
+      "line_hint": "src/config/store.ts:20",
+      "description": "getConfig now memoizes values in the module-level `cache` Map, but updateConfig writes the new value to the DB without invalidating or updating that cache (no cache.delete(key) / cache.set(key, value)). After any update, getConfig keeps returning the stale cached value for the life of the process. updateConfig is itself modified in this diff (new `actor` param and log), so the invalidation belongs here. The added caching and the write path are both in the diff; the bug is that they aren't wired together.",
+      "must_catch": true
+    }
+  ]
+}

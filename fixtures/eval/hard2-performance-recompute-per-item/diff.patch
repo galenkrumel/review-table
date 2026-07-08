@@ -1,0 +1,23 @@
+diff --git a/src/report/leaderboard.ts b/src/report/leaderboard.ts
+index 1111111..2222222 100644
+--- a/src/report/leaderboard.ts
++++ b/src/report/leaderboard.ts
+@@ -5,8 +5,12 @@ import { fetchScores } from "./scores";
+
+-export function buildRows(players: Player[], scores: Score[]): Row[] {
+-  const ranked = [...scores].sort((a, b) => b.points - a.points);
+-  return players.map((p) => ({
+-    name: p.name,
+-    rank: ranked.findIndex((s) => s.playerId === p.id) + 1,
+-  }));
++function rankOf(scores: Score[], playerId: string): number {
++  const ranked = [...scores].sort((a, b) => b.points - a.points);
++  return ranked.findIndex((s) => s.playerId === playerId) + 1;
++}
++
++export function buildRows(players: Player[], scores: Score[]): Row[] {
++  return players.map((p) => ({
++    name: p.name,
++    rank: rankOf(scores, p.id),
++  }));
++}

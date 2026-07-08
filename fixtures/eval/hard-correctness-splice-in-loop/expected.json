@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "forward-splice-skips-element",
+      "category": "correctness",
+      "severity": "high",
+      "line_hint": "src/util/prune.ts:4",
+      "description": "The loop was changed from reverse iteration to forward iteration while still calling `sessions.splice(i, 1)` during the loop. Removing index i shifts every later element down by one, but i still increments, so the element immediately after each removed one is skipped and never checked. Consecutive expired sessions are only half-pruned. Reverse iteration (the original) is exactly what avoids this; the refactor reintroduces the classic mutate-while-iterating bug.",
+      "must_catch": true
+    }
+  ]
+}

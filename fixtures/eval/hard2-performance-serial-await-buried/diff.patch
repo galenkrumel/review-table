@@ -1,0 +1,25 @@
+diff --git a/src/sync/replicate.ts b/src/sync/replicate.ts
+index 1111111..2222222 100644
+--- a/src/sync/replicate.ts
++++ b/src/sync/replicate.ts
+@@ -12,5 +12,18 @@ import { pushToReplica } from "./client";
+
+ export async function replicate(replicas: Replica[], payload: Payload): Promise<Result[]> {
+-  const results = await Promise.all(replicas.map((r) => pushToReplica(r, payload)));
+-  return results;
++  const results: Result[] = [];
++  // Retry each replica up to 3 times with exponential backoff before giving up.
++  for (const r of replicas) {
++    let attempt = 0;
++    while (true) {
++      try {
++        results.push(await pushToReplica(r, payload));
++        break;
++      } catch (err) {
++        if (++attempt >= 3) throw err;
++        await sleep(2 ** attempt * 100);
++      }
++    }
++  }
++  return results;
+ }

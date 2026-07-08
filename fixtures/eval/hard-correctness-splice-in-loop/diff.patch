@@ -1,0 +1,12 @@
+diff --git a/src/util/prune.ts b/src/util/prune.ts
+index 1111111..2222222 100644
+--- a/src/util/prune.ts
++++ b/src/util/prune.ts
+@@ -3,6 +3,6 @@ import type { Session } from "./types";
+
+ export function pruneExpired(sessions: Session[], now: number): void {
+-  for (let i = sessions.length - 1; i >= 0; i--) {
++  for (let i = 0; i < sessions.length; i++) {
+     if (sessions[i].expiresAt <= now) sessions.splice(i, 1);
+   }
+ }

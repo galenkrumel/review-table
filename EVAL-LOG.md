@@ -62,4 +62,58 @@ hard set and re-baselines.
 
 ---
 
-<!-- Add Entry 1 below when the hard fixture set exists. Keep the shape above. -->
+## Entry 1 — Calibration: recall has no headroom → recall becomes a guardrail — 2026-07-07
+
+**Config:** dogs `claude-opus-4-8` (with a `claude-sonnet-5` cross-check) · judge `claude-sonnet-5` ·
+12 hard cases authored across two batches.
+
+**Intent.** Entry 0 predicted the next move was a hard fixture set to drop recall below 100% and
+create headroom. Authored two batches to do exactly that:
+- `hard-*` (6) — subtle *single-bug* diffs: allSettled-swallow, splice-in-loop, open-redirect
+  prefix-match, prototype pollution, memo-key timestamp, Set-rebuilt-in-loop.
+- `hard2-*` (6) — realistic 25–45 line diffs that *bury* the real bug under a plausible "feature"
+  (rate-limit sleep, RBAC, filtering, retry/backoff, helper extraction) plus decoys: stale-cache-on
+  -update, dropped partial batch, dropped token-expiry, IDOR in a filtered branch, serial-await
+  buried in retry, per-item re-sort.
+
+**Result — the hypothesis failed:**
+
+| Batch | Dogs | Recall | Additional |
+| --- | --- | --- | --- |
+| `hard` (6)  | `opus-4-8`  | 6/6 (100%) | 0  |
+| `hard` (6)  | `sonnet-5`  | 6/6 (100%) | 12 |
+| `hard2` (6) | `opus-4-8`  | 6/6 (100%) | 8  |
+
+Opus caught **18/18** across both batches — including the buried-bug diffs — with perfect in-lane
+specialty catch-rate. Sonnet also went 6/6.
+
+**Cost:** ~$4.4 calibration (opus hard $0.92, sonnet hard $1.49, opus hard2 $2.00).
+
+**Takeaway — the real finding.** Recall on planted bugs is **saturated for a capable panel, and it's
+structural.** This isn't one model reading a diff — it's a **3-dog panel debating over many turns**
+(ensemble recall). Every dog gets a shot at every bug, so ensemble recall on any *catchable* bug
+saturates. Hand-authoring a diff-only, unambiguous bug that a frontier panel misses isn't achievable
+at sane effort, and weakening the panel to Sonnet buys nothing here (Sonnet is also 6/6 — and
+*chattier/pricier*, not weaker at catching these).
+
+**Decision.**
+- **Demote recall to a guardrail** — a regression check ("an improvement didn't make the dogs start
+  *missing* planted bugs"), not the improvement axis. Recognizing a saturated metric and repurposing
+  it is the eval judgment, not a dead end.
+- **Keep the 12 hard fixtures** — valid, and they double as review-drivers for the new axes (any diff
+  drives a full review).
+- **Pivot the improvement work** to axes with real headroom, all computable from the transcripts the
+  harness already captures:
+  - *Orchestration / floor control* — turn balance across dogs, lane-routing accuracy (security→Bella,
+    perf→Duke, correctness→Rex), hunk coverage, anti-agreeableness (pushback before resolve). Headroom
+    already evidenced by the opener-bias toward Rex.
+  - *Persona distinctiveness* — blind attribution of unlabeled lines to the right dog (tests the
+    "personas must not collapse into one voice" invariant).
+
+**Next:** a free structural readout of the orchestration metrics over the cached transcripts, to
+confirm the headroom is real before spending on a live baseline.
+
+---
+
+<!-- Add Entry 2 below (first orchestration/persona experiment). Keep the shape above. -->
+

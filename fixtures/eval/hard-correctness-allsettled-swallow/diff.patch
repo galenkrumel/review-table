@@ -1,0 +1,14 @@
+diff --git a/src/data/records.ts b/src/data/records.ts
+index 1111111..2222222 100644
+--- a/src/data/records.ts
++++ b/src/data/records.ts
+@@ -11,7 +11,7 @@ import { fetchRecord } from "./client";
+
+ export async function loadNames(ids: string[]): Promise<string[]> {
+-  // Fail fast if any record is missing.
+-  const records = await Promise.all(ids.map((id) => fetchRecord(id)));
+-  return records.map((r) => r.name);
++  // More robust: one bad id shouldn't fail the whole batch.
++  const records = await Promise.allSettled(ids.map((id) => fetchRecord(id)));
++  return records.map((r) => r.value.name);
+ }

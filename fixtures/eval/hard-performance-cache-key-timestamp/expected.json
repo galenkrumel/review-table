@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "timestamp-defeats-memo",
+      "category": "performance",
+      "severity": "med",
+      "line_hint": "src/pricing/quote.ts:6",
+      "description": "Adding `Date.now()` to the memo key makes every call produce a unique key, so `memo.has(key)` is never true — the cache hit rate drops to zero and `computeQuote` runs every time. Worse, `memo` is a module-level Map with no eviction: a fresh key on every call means it grows without bound for the life of the process, a memory leak. The key should be derived only from the inputs that determine the quote (userId, cartHash).",
+      "must_catch": true
+    }
+  ]
+}

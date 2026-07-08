@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "idor-missing-owner-scope",
+      "category": "security",
+      "severity": "high",
+      "line_hint": "src/api/documents.ts:14",
+      "description": "The added folder-filter branch builds the query as `{ folderId: String(folder) }` with NO `ownerId: userId` constraint, so any authenticated user can list another user's documents by passing `?folder=<id>`. Only the else branch (no folder) keeps the ownership scope. This is an IDOR / broken access control introduced while adding filtering — the owner constraint must be part of every branch (e.g. `{ ownerId: userId, folderId: ... }`).",
+      "must_catch": true
+    }
+  ]
+}

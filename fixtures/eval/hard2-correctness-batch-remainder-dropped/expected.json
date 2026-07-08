@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "partial-batch-dropped",
+      "category": "correctness",
+      "severity": "high",
+      "line_hint": "src/jobs/mailer.ts:10",
+      "description": "The loop condition changed from `i < queue.length` to `i + BATCH <= queue.length`. That only iterates while a full BATCH of items remains, so the final partial batch (queue.length % BATCH items) is never delivered — those emails are silently dropped and `sent` under-reports. The original `i < queue.length` handled the remainder. The visible point of the diff is the added rate-limit sleep; the off-by-a-batch is the buried regression.",
+      "must_catch": true
+    }
+  ]
+}

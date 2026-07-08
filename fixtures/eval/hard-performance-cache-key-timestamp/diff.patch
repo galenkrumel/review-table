@@ -1,0 +1,12 @@
+diff --git a/src/pricing/quote.ts b/src/pricing/quote.ts
+index 1111111..2222222 100644
+--- a/src/pricing/quote.ts
++++ b/src/pricing/quote.ts
+@@ -4,6 +4,6 @@ const memo = new Map<string, Quote>();
+
+ export function priceQuote(userId: string, cartHash: string): Quote {
+-  const key = `${userId}:${cartHash}`;
++  const key = `${userId}:${cartHash}:${Date.now()}`;
+   if (memo.has(key)) return memo.get(key)!;
+   const quote = computeQuote(userId, cartHash);
+   memo.set(key, quote);

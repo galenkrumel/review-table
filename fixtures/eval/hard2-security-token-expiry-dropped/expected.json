@@ -1,0 +1,13 @@
+{
+  "clean": false,
+  "issues": [
+    {
+      "id": "token-expiry-check-dropped",
+      "category": "security",
+      "severity": "high",
+      "line_hint": "src/auth/middleware.ts:22",
+      "description": "verifySignature validates the HMAC only (the retained comment even says 'expiry is enforced below'), but the refactor deletes the sole expiry check `if (claims.exp * 1000 < Date.now()) return 401` while adding role-based access. Expired tokens now authenticate successfully — a stolen or long-lived token never stops working. The salient change is the new RBAC branch; the dropped expiry enforcement is the buried security regression.",
+      "must_catch": true
+    }
+  ]
+}
