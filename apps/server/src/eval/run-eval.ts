@@ -48,11 +48,11 @@ import type {
   TtsAdapter,
   Verdict,
 } from "@review-table/contracts";
-import { setAdapters } from "../adapters";
+import { createLiveLlmAdapter, setAdapters } from "../adapters";
 import { AnthropicLlmAdapter } from "../adapters/anthropic";
 import { AI_SEATS, displayName } from "../config";
 import { ReviewControls } from "../control";
-import { ANTHROPIC_MODEL, JUDGE_MODEL } from "../env";
+import { ANTHROPIC_MODEL, DIRECTOR_MODEL, JUDGE_MODEL } from "../env";
 import { runReview, type TurnSink } from "../orchestrator";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -262,6 +262,10 @@ const PRICING: Record<string, { in: number; out: number }> = {
   "claude-sonnet-4-6": { in: 3, out: 15 },
   "claude-haiku-4-5-20251001": { in: 1, out: 5 },
   "claude-haiku-4-5": { in: 1, out: 5 },
+  // Locally-served via Ollama — genuinely $0 marginal cost, not "unpriced". Listed
+  // explicitly so priceFor's Opus-tier fallback doesn't misprice a free local run.
+  "gemma4:31b": { in: 0, out: 0 },
+  "qwen3.6:35b": { in: 0, out: 0 },
 };
 export function priceFor(modelId: string): { in: number; out: number } {
   return PRICING[modelId] ?? { in: 5, out: 25 };
@@ -1227,10 +1231,10 @@ async function preflight(llm: LlmAdapter, opts: { dogs: boolean; judge: boolean 
   const checks: Array<[string, () => Promise<unknown>]> = [];
   if (opts.dogs) {
     checks.push([
-      `director ${ANTHROPIC_MODEL} (structured)`,
+      `director ${DIRECTOR_MODEL} (structured)`,
       () =>
         llm.completeStructured({
-          model_id: ANTHROPIC_MODEL,
+          model_id: DIRECTOR_MODEL,
           system: "Reply JSON.",
           messages,
           schema,
@@ -2077,7 +2081,7 @@ async function main() {
   }
 
   const usage = new Usage();
-  const llm = new TrackingLlmAdapter(new AnthropicLlmAdapter(), usage);
+  const llm = new TrackingLlmAdapter(createLiveLlmAdapter(), usage);
 
   if (needsLive) {
     // Only preflight the paths this invocation will actually drive: the orchestrator runs

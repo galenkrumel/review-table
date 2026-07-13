@@ -3,18 +3,24 @@
 // (FR-11); model id and voices come from env with sensible defaults.
 
 import type { AiSeat, Seat, SessionConfig } from "@review-table/contracts";
-import { ANTHROPIC_MODEL, DIRECTOR_MODEL } from "./env";
+import { ANTHROPIC_MODEL, DIRECTOR_MODEL, OLLAMA_MODELS } from "./env";
 
 const VOICE_REX = process.env.VOICE_REX ?? "VR6AewLTigWG4xSOukaG"; // deep
 const VOICE_BELLA = process.env.VOICE_BELLA ?? "21m00Tcm4TlvDq8ikWAM"; // clear
 const VOICE_DUKE = process.env.VOICE_DUKE ?? "TxGEqnHWrfWFTfGW9XjX"; // calm
+
+// All three dog seats share ANTHROPIC_MODEL as their model_id (set it to a name in
+// OLLAMA_MODELS to run the dogs' speaker calls locally via RoutingLlmAdapter). The
+// provider label below follows that same routing decision so lineup reporting
+// (fixtures/eval/history.jsonl, EVAL-REPORT.md) reflects who actually served the call.
+const DOG_PROVIDER = OLLAMA_MODELS.has(ANTHROPIC_MODEL) ? "ollama" : "anthropic";
 
 const rex: AiSeat = {
   id: "rex",
   kind: "ai",
   display_name: "Rex",
   sprite: "rex",
-  provider: "anthropic",
+  provider: DOG_PROVIDER,
   model_id: ANTHROPIC_MODEL,
   voice_id: VOICE_REX,
   is_lead: true,
@@ -33,7 +39,7 @@ const bella: AiSeat = {
   kind: "ai",
   display_name: "Bella",
   sprite: "bella",
-  provider: "anthropic",
+  provider: DOG_PROVIDER,
   model_id: ANTHROPIC_MODEL,
   voice_id: VOICE_BELLA,
   is_lead: false,
@@ -49,7 +55,7 @@ const duke: AiSeat = {
   kind: "ai",
   display_name: "Duke",
   sprite: "duke",
-  provider: "anthropic",
+  provider: DOG_PROVIDER,
   model_id: ANTHROPIC_MODEL,
   voice_id: VOICE_DUKE,
   is_lead: false,

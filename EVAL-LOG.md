@@ -29,13 +29,13 @@ appended to. Each entry's own "Next" paragraph is a proposal made in the moment,
 when more than one becomes plausible, they land here instead of fighting over which one is "the"
 next entry. When an item is picked up, promote it into a new entry and delete it from this list.
 
-- **Local free-model lineup (Ollama)** — swap the dog panel to locally-served open-weight models
-  (currently: gemma4-31b, qwen3.6-35b) via a new `streamText`-only adapter (`apps/server/src/
-  adapters/ollama.ts`) routed per-seat by the existing `AiSeat.provider` field; director and judge
-  stay on Anthropic (structured-output reliability + measurement-instrument consistency). Compare
-  recall and persona-distinctiveness against the Entry 3/4 Opus baseline. Zero marginal API cost;
-  open questions are whether recall or persona separation degrade at this capability tier, and how
-  local hardware wall-clock compares to API latency. **Prioritized — pursue next.**
+- **qwen3.6:35b pilot** — Entry 5 only piloted `gemma4:31b`; a smoke test of `qwen3.6:35b` on the
+  exact same Rex prompt produced degenerate staccato output ("Off. Bound. Wrong. Needs. Less.
+  Equal. Not. Equal.") instead of coherent terse dialogue. Worth a real harness pilot (not just one
+  sample) before writing it off — could be a prompt-fit issue, not a capability gap.
+- **Persona-probe on local-model transcripts** — Entry 5 measured recall on `gemma4:31b`, not voice
+  distinctiveness. Small live-judge cost (~$0.20–0.30) to see whether Rex/Bella/Duke stay
+  attributable on a weaker local model, comparable to the Entry 3/4 Opus baseline.
 - **Bella recovery** — Entry 4's Rex/Duke sharpening cost Bella 8pt of recall (78%→70%) even though
   her prompt didn't change, because Rex's new "pointed, no hand-waving" framing now overlaps Bella's
   own "asks pointed questions." Try dialing that back in Rex to see if Bella's number recovers
@@ -298,5 +298,81 @@ becomes Entry 5. Re-running this same protocol is also the standing regression c
 
 ---
 
-<!-- Add Entry 5 below. Keep the shape above. -->
+## Entry 5 — Local free-model pilot: gemma4:31b dogs, Opus director — 2026-07-13
+
+**Config:** dogs `gemma4:31b` (locally-served via Ollama) · director `claude-opus-4-8` · judge
+`claude-sonnet-5` · the 36 non-`hard2` cases (Entry 0's original case set).
+
+**Change:** Built `apps/server/src/adapters/ollama.ts` (`streamText`-only — `completeStructured`
+intentionally throws; the director and judge always stay on Anthropic for structured-output
+reliability) plus `RoutingLlmAdapter` in `adapters/index.ts`, which dispatches every call by
+`model_id` so a review can mix providers with zero changes to `director.ts`/`speaker.ts` — they
+already pass a per-seat `model_id` on every call. Two real bugs surfaced and fixed while wiring
+this up, both latent because `ANTHROPIC_MODEL` and `DIRECTOR_MODEL` had never diverged before:
+
+- `run-eval.ts`'s preflight checked the director's structured-output path against
+  `ANTHROPIC_MODEL` instead of `DIRECTOR_MODEL` — would have failed preflight and aborted the run
+  the moment the two pointed at different models (exactly this config).
+- `config.ts` hardcoded every seat's `provider: "anthropic"`, so `history.jsonl`'s lineup column
+  would have read `anthropic/gemma4:31b` — wrong, it ran on Ollama. Now derived from
+  `OLLAMA_MODELS` membership.
+
+**Hypothesis:** does recall hold when the dogs' voice-generation model swaps from Opus to a free,
+~31B locally-served model, with the director kept on Anthropic for move reliability?
+
+**Result:**
+
+| Metric | Value |
+| --- | --- |
+| Recall | **28/28 (100%)** — matches Opus on this same case set |
+| Rex specialty catch-rate | 73% (8/11) |
+| Bella specialty catch-rate | 100% (9/9) |
+| Duke specialty catch-rate | 75% (6/8) |
+| Additional findings | 11 (descriptive only) |
+
+Recall held completely — no degradation from swapping the dogs' voice model, and the per-dog
+specialty profile lands in the same range as the Opus lineups (Entries 0 and 4).
+
+**Cost — the "free" framing needs a correction.** Total cost was **~$4.43, not $0**:
+
+| Model | Role | Calls | Cost |
+| --- | --- | --- | --- |
+| `claude-opus-4-8` | director (labeled "dogs" in the report — see caveat below) | 378 | ~$4.25 |
+| `claude-sonnet-5` | judge | 37 | ~$0.18 |
+| `gemma4:31b` | dogs | 320 | **~$0.00** |
+
+The dogs' own speech generation really was free — that part of the idea worked. But the director
+runs every turn regardless of which model voices the dogs, and it stayed on paid Opus by design
+(structured-move reliability, invariant 4). So "free models" only ever eliminates the dog-voice
+cost, not the review's total cost — savings are real but partial. (Report caveat: the cost table's
+"Role" column infers "dogs" vs "judge" from a two-way check against `JUDGE_MODEL`/`ANTHROPIC_MODEL`
+and doesn't know about `DIRECTOR_MODEL` as a third possibility, so it mislabels the director's Opus
+calls as "dogs" here. The dollar amounts are correct; only the row label is wrong. Not fixed this
+entry — cosmetic, and the fix touches `Usage`'s role-inference logic more broadly than this pilot
+needed.)
+
+**Wall-clock:** ~45 minutes for 36 cases at concurrency 4 (Ollama's `think: false` cut per-turn
+latency roughly 4×, from ~4.6s to ~1–5s per line depending on prompt length, but that is still an
+order of magnitude slower than the API). A qualitative smoke test of `qwen3.6:35b` on the identical
+Rex prompt (outside this harness run) produced degenerate staccato output — "Off. Bound. Wrong.
+Needs. Less. Equal. Not. Equal." — instead of coherent dialogue, unlike `gemma4:31b`'s solid,
+on-persona result. Not yet run through the real harness; tracked in the backlog.
+
+**Takeaway.** The core finding holds up: swapping the dogs' voice model to a free, local ~31B
+model cost nothing in recall. But this is genuinely a cost-*shape* change, not a cost-*elimination*
+one — the director's Anthropic spend is structurally fixed by the two-call design (invariant 1),
+so the real number to quote is "dog-voice generation is free," not "this review is free." Latency
+is also a real, separate constraint from dollar cost: local hardware here is roughly 10x slower
+per turn than the API.
+
+**Guardrails unchanged:** recall held; this pilot didn't touch personas, so Entry 3/4's
+persona-distinctiveness numbers aren't affected (and weren't re-measured against gemma's voice —
+see backlog).
+
+**Next.** See the Backlog section above — a `qwen3.6:35b` harness pilot and a persona-probe pass
+over these `gemma4:31b` transcripts are both queued; neither is picked as canonically next.
+
+---
+
+<!-- Add Entry 6 below. Keep the shape above. -->
 

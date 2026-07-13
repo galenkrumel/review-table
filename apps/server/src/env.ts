@@ -25,6 +25,16 @@ export const DIRECTOR_MODEL = process.env.DIRECTOR_MODEL ?? ANTHROPIC_MODEL;
 // $10/$50 per-MTok cost. Override with JUDGE_MODEL (claude-fable-5 for a gold-standard pass;
 // claude-haiku-4-5-20251001 for a cheap, noisier check; claude-opus-4-8 to judge with the dog model).
 export const JUDGE_MODEL = process.env.JUDGE_MODEL ?? "claude-sonnet-5";
+// Locally-served open-weight models (Ollama), routed per-model-id by RoutingLlmAdapter
+// (apps/server/src/adapters/index.ts) — an opt-in allowlist so an unrecognized/typo'd
+// model id falls through to Anthropic (and errors loudly there) rather than silently
+// misrouting. Set ANTHROPIC_MODEL to one of these to run the dogs' speaker calls locally;
+// keep DIRECTOR_MODEL and JUDGE_MODEL on an Anthropic model, since only Anthropic here
+// supports the director/judge's structured-output path.
+export const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? "http://localhost:11434";
+export const OLLAMA_MODELS = new Set(
+  (process.env.OLLAMA_MODELS ?? "gemma4:31b,qwen3.6:35b").split(",").map((s) => s.trim()),
+);
 export const ELEVENLABS_MODEL = process.env.ELEVENLABS_MODEL ?? "eleven_turbo_v2_5";
 export const ELEVENLABS_STT_MODEL = process.env.ELEVENLABS_STT_MODEL ?? "scribe_v1";
 
