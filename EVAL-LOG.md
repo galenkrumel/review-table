@@ -22,6 +22,26 @@ measured result, repeated. This is the human narrative; the machine records live
 - Tag each run with `pnpm eval --label "what I changed"` so the run's `history.jsonl` row and the
   in-report History table carry the same label as the entry here.
 
+## Backlog (living — candidate next measurements, not history)
+
+Unlike the entries below, this section is mutable: edited in place as priorities change, not
+appended to. Each entry's own "Next" paragraph is a proposal made in the moment, not a commitment —
+when more than one becomes plausible, they land here instead of fighting over which one is "the"
+next entry. When an item is picked up, promote it into a new entry and delete it from this list.
+
+- **Local free-model lineup (Ollama)** — swap the dog panel to locally-served open-weight models
+  (currently: gemma4-31b, qwen3.6-35b) via a new `streamText`-only adapter (`apps/server/src/
+  adapters/ollama.ts`) routed per-seat by the existing `AiSeat.provider` field; director and judge
+  stay on Anthropic (structured-output reliability + measurement-instrument consistency). Compare
+  recall and persona-distinctiveness against the Entry 3/4 Opus baseline. Zero marginal API cost;
+  open questions are whether recall or persona separation degrade at this capability tier, and how
+  local hardware wall-clock compares to API latency. **Prioritized — pursue next.**
+- **Bella recovery** — Entry 4's Rex/Duke sharpening cost Bella 8pt of recall (78%→70%) even though
+  her prompt didn't change, because Rex's new "pointed, no hand-waving" framing now overlaps Bella's
+  own "asks pointed questions." Try dialing that back in Rex to see if Bella's number recovers
+  without giving back Rex's gain. Lower priority — not a regression against any guardrail, just
+  unclaimed headroom.
+
 ---
 
 ## Entry 0 — Baseline (easy set) — 2026-07-07
@@ -217,5 +237,66 @@ modal + per-dog recall. Target: lift Duke and Rex recall without collapsing Bell
 
 ---
 
-<!-- Add Entry 4 below (first persona intervention result). Keep the shape above. -->
+## Entry 4 — First persona intervention: sharpen Rex/Duke voices — 2026-07-13
+
+**Config:** dogs `claude-opus-4-8` (all 42 transcripts regenerated fresh, `--fresh`, same case set
+as Entry 3) · judge `claude-sonnet-5` · modal of 3 judge passes · same blind-attribution protocol.
+
+**Change:** Rewrote the Rex and Duke `persona_prompt`s in `apps/server/src/config.ts` (and the
+judge's mirrored copy in `persona-probe.ts`), leaving Bella untouched. Entry 3 found Rex and Duke
+collapsing into each other despite occupying different lanes — both read as "short, blunt, opinionated"
+in isolation, once stripped of speaker label and lane content. The fix targets *register*, not lane:
+
+- **Rex** — pushed further into clipped, fragment-heavy terseness ("clipped fragments, not full
+  sentences") and an experience-tell ("has seen this exact mistake bite someone before").
+- **Duke** — pulled the other direction, into a conversational, tradeoff-reasoning register ("talks
+  like someone leaning back in a chair," reasons out loud about cost/benefit) instead of Rex-style
+  flat verdicts.
+
+**Hypothesis:** if the collapse was a voice problem (register/rhythm) rather than a content problem
+(both dogs *sound* similar even when talking about different things), separating Rex and Duke's
+registers should lift both dogs' recall without touching Bella, who was already distinct.
+
+**Result — before vs. after:**
+
+| Metric | Entry 3 (baseline) | Entry 4 (after) | Δ |
+| --- | --- | --- | --- |
+| MODAL attribution accuracy | 57.6% | **63.5%** | **+5.9pt** |
+| Majority-class floor | 36.0% | 34.8% | — |
+| Lift over majority-class floor | 21.6pt | **28.7pt** | **+7.1pt** |
+| Per-run accuracy | 55.8 / 58.6 / 55.8% | 61.8 / 64.1 / 61.0% | +6.0pt avg |
+| Judge self-agreement (unanimous) | 74% | 79% | +5pt |
+
+Per-dog recall:
+
+| Dog | Entry 3 | Entry 4 | Δ |
+| --- | --- | --- | --- |
+| Rex | 50% | **59%** | +9pt |
+| Bella | 78% | 70% | **−8pt** |
+| Duke | 46% | **61%** | +15pt |
+
+**Reading.** The hypothesis mostly held: Duke moved the most (+15pt — the conversational/tradeoff
+rewrite did the most work), Rex improved more modestly (+9pt — clipped fragments help but Rex was
+already fairly distinct), and overall lift-over-floor rose 7.1pt. The confusion matrix shows the
+Rex↔Duke cross-confusion specifically eased. The one side effect: **Bella dropped 8pt** even though
+her prompt didn't change — the new Rex, sharpened into "pointed, no hand-waving" terseness, now bleeds
+into some of Bella's own pointed/suspicious lines (25 of Bella's 118 lines were misattributed to Rex).
+Net positive — total accuracy and floor-lift both up — but the fix wasn't free; sharpening one voice
+narrowed the gap to an adjacent one. Recall (Entry 1) held at 34/34 (100%) on the full regen — no
+orchestration or catch-rate regression from the persona change.
+
+**Cost:** ~$7.38 for the 42-case live regen (dogs `$7.15` + eval-judge `$0.24`, from `EVAL-REPORT.md`'s
+usage table) + ~$0.25 (estimated; the probe script doesn't track cost itself) for the fully-live
+modal-of-3 persona pass (351 lines × 3 passes, no cache reuse since the new voice produces new line
+text). Total ≈ **$7.63**, in line with the priced estimate before running it.
+
+**Next.** This run surfaced more than one plausible follow-up (a Bella-recovery tweak, and — independent
+of this result — a local free-model lineup to try now that hardware allows it). Rather than pick one
+as *the* next entry, both are tracked in the Backlog section above; whichever gets picked up first
+becomes Entry 5. Re-running this same protocol is also the standing regression check whenever
+`config.ts` personas change again.
+
+---
+
+<!-- Add Entry 5 below. Keep the shape above. -->
 
