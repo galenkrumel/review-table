@@ -29,6 +29,15 @@ appended to. Each entry's own "Next" paragraph is a proposal made in the moment,
 when more than one becomes plausible, they land here instead of fighting over which one is "the"
 next entry. When an item is picked up, promote it into a new entry and delete it from this list.
 
+- **Gemma as director** — Entry 5 only tested Gemma in the dog-voice role; the director (who
+  decides who speaks next and steers each thread) stayed on Opus the whole time and was never
+  tested locally. This is a materially harder ask than voicing a dog: the director must emit
+  valid structured moves every turn (invariant 4 — a malformed move is a bug, not a thing to
+  regex around), which is exactly why `OllamaLlmAdapter.completeStructured` currently throws
+  rather than attempting it. Testing this means implementing structured/JSON-constrained output
+  for Ollama first, then measuring whether Gemma can hold up the director's role reliably over a
+  full multi-turn review — a real open question, not assumed to work the way the dog-voice swap
+  did.
 - **qwen3.6:35b pilot** — Entry 5 only piloted `gemma4:31b`; a smoke test of `qwen3.6:35b` on the
   exact same Rex prompt produced degenerate staccato output ("Off. Bound. Wrong. Needs. Less.
   Equal. Not. Equal.") instead of coherent terse dialogue. Worth a real harness pilot (not just one
